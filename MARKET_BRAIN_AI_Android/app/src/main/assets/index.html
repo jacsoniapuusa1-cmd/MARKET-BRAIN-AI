@@ -1,58 +1,209 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#07111f">
 <title>MARKET BRAIN AI</title>
 <style>
 :root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--amber:#ffc66d}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#07111f,#0b1728);color:#eef5ff;font:15px system-ui, sans-serif}
-main{max-width:760px;margin:auto;padding:20px 16px 40px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-weight:850;letter-spacing:1.4px;font-size:19px}.tag{border:1px solid #8a6730;color:var(--amber);border-radius:99px;padding:5px 10px;font-size:11px;font-weight:700}
-h1{font-size:27px;line-height:1.1;margin:24px 0 7px}.sub{color:var(--muted);margin:0 0 18px}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(160deg,#07111f,#0b1728);color:#eef5ff;font:15px system-ui,sans-serif}
+main{max-width:760px;margin:auto;padding:20px 16px 40px}
+.top,.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:850;letter-spacing:1.4px;font-size:19px}
+.tag,.pill{font-size:11px;border-radius:99px;padding:5px 9px;background:#27364b;color:#c8d7e8}
+.tag{border:1px solid #8a6730;color:var(--amber)}
+h1{font-size:27px;margin:24px 0 7px}
+.sub,.muted{color:var(--muted)}
+.sub{margin:0 0 18px}
+.muted{font-size:12px}
 .card{background:rgba(16,30,49,.94);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.muted{color:var(--muted);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.metric{background:#0b192b;border:1px solid var(--line);border-radius:13px;padding:13px}
-.metric b{display:block;font-size:18px;margin-top:5px}.section{font-weight:750;margin-bottom:12px}
-.asset{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.asset:last-child{border:0}
-.pill{font-size:11px;border-radius:99px;padding:5px 9px;background:#27364b;color:#c8d7e8}
-button{border:0;border-radius:12px;background:#168bd2;color:white;padding:13px 16px;font-weight:750;width:100%;font-size:14px;margin-top:10px}
-.notice{font-size:12px;color:#b8c8da;line-height:1.5}.big{font-size:24px;font-weight:850;color:var(--blue)}
+.section{font-weight:750;margin-bottom:12px}
+.big{font-size:27px;font-weight:850;color:var(--blue);margin:7px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metric{background:#0b192b;border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}
+.metric b{display:block;font-size:17px;margin-top:5px;overflow-wrap:anywhere}
+button,select{border:1px solid var(--line);border-radius:12px;padding:13px;background:#14263c;color:white;font-weight:700;font-size:14px}
+button{background:#168bd2;border:0;width:100%;margin-top:12px}
+button:disabled{opacity:.5}
+select{width:100%;margin-top:8px}
+.notice{font-size:12px;color:#b8c8da;line-height:1.5}
+.asset{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.asset:last-child{border:0}
 footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
-</style></head>
-<body><main>
-<div class="top"><div class="brand">◈ MARKET BRAIN AI</div><span class="tag">MODO DEMO</span></div>
-<h1>Central de inteligência</h1><p class="sub">Scanner multimercado · análise seletiva · gestão de risco</p>
+.good{color:var(--green)}.bad{color:#ff8585}
+</style>
+</head>
+<body>
+<main>
+<div class="top">
+ <div class="brand">◈ MARKET BRAIN AI</div>
+ <span class="tag">BINANCE SPOT</span>
+</div>
+
+<h1>Central de inteligência</h1>
+<p class="sub">Consulta de mercado · dados públicos · sem ordens automáticas</p>
+
 <div class="card">
- <div class="row"><div><div class="muted">ESTADO DO SISTEMA</div><div class="big">Núcleo inicial</div></div><span class="pill">Sem conexão ao vivo</span></div>
- <p class="notice">Esta versão é a estrutura visual inicial. Ainda não recebe cotações, não calcula sinais reais e não envia ordens.</p>
+ <div class="row">
+  <b>Conexão com dados da Binance</b>
+  <span class="pill" id="status">Aguardando</span>
+ </div>
+ <p class="notice" id="message">Toque em consultar para buscar dados públicos do mercado.</p>
+ <button id="refresh" onclick="loadMarket()">Consultar mercado</button>
+ <p class="muted" id="updated">Nenhuma consulta realizada.</p>
 </div>
-<div class="grid">
- <div class="metric"><span class="muted">Mercados planejados</span><b>Multimercado</b></div>
- <div class="metric"><span class="muted">Seletividade</span><b>Muito alta</b></div>
- <div class="metric"><span class="muted">Modo de operação</span><b>Simulação</b></div>
- <div class="metric"><span class="muted">Execução automática</span><b>Desativada</b></div>
-</div>
+
 <div class="card">
- <div class="section">Universo de mercados</div>
- <div class="asset"><div><b>Criptomoedas</b><div class="muted">BTC · ETH · SOL · XRP</div></div><span class="pill">Planejado</span></div>
- <div class="asset"><div><b>Forex</b><div class="muted">EUR/USD · GBP/USD · USD/JPY</div></div><span class="pill">Planejado</span></div>
- <div class="asset"><div><b>Ações e índices</b><div class="muted">Ações · Nasdaq · S&amp;P 500 · Ibovespa</div></div><span class="pill">Planejado</span></div>
- <div class="asset"><div><b>Commodities</b><div class="muted">Ouro · prata · petróleo</div></div><span class="pill">Planejado</span></div>
+ <div class="section">Ativo em análise</div>
+ <div class="grid">
+  <div class="metric">
+   <span class="muted">Par</span>
+   <b>ETH/USDT</b>
+  </div>
+  <div class="metric">
+   <span class="muted">Último preço</span>
+   <b id="price">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">Período das velas</span>
+   <select id="interval" onchange="loadMarket()">
+    <option value="1m">1 minuto</option>
+    <option value="5m" selected>5 minutos</option>
+   </select>
+  </div>
+  <div class="metric">
+   <span class="muted">Variação da última vela</span>
+   <b id="change">--</b>
+  </div>
+ </div>
 </div>
+
 <div class="card">
- <div class="section">Motor de análise</div>
- <div class="asset"><span>Tendência e estrutura de mercado</span><span class="pill">A implementar</span></div>
- <div class="asset"><span>Momentum, volume e volatilidade</span><span class="pill">A implementar</span></div>
- <div class="asset"><span>Price Action e liquidez</span><span class="pill">A implementar</span></div>
- <div class="asset"><span>Probabilidade e validação histórica</span><span class="pill">A implementar</span></div>
- <div class="asset"><span>Seleção de duração em minutos</span><span class="pill">A implementar</span></div>
+ <div class="section">Últimas velas recebidas</div>
+ <div id="candles" class="notice">Aguardando consulta dos dados.</div>
 </div>
+
 <div class="card">
- <div class="section">Painel de sinais</div>
- <div class="row"><b>Nenhum sinal real disponível</b><span class="pill">AGUARDANDO DADOS</span></div>
- <p class="notice">O sistema só poderá emitir sinais após conectar fontes de dados confiáveis, sincronizar horários e validar cada estratégia por ativo e duração.</p>
+ <div class="section">Estado do scanner</div>
+ <div class="row">
+  <b id="scanner">Aguardando dados</b>
+  <span class="pill">Somente análise</span>
+ </div>
+ <p class="notice">
+  Esta etapa consulta preços e candles públicos. Ainda não é um scanner
+  de sinais, não prevê resultados e não realiza compras ou vendas.
+ </p>
 </div>
-<button onclick="alert('Esta versão é uma prévia demonstrativa. O scanner será ativado após a integração e validação das fontes de mercado.')">Verificar estado do scanner</button>
-<footer>MARKET BRAIN AI · versão estrutural 0.1.0<br>Ferramenta em desenvolvimento. Não é recomendação financeira.</footer>
-</main></body></html>
+
+<footer>
+MARKET BRAIN AI · versão 0.2.0<br>
+Dados públicos da Binance Spot. Não é recomendação financeira.
+</footer>
+</main>
+
+<script>
+const API = "https://data-api.binance.vision";
+const money = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4
+});
+
+function el(id) {
+  return document.getElementById(id);
+}
+
+async function getJSON(path) {
+  const response = await fetch(API + path);
+  if (!response.ok) {
+    throw new Error("Resposta HTTP " + response.status);
+  }
+  return response.json();
+}
+
+async function loadMarket() {
+  const button = el("refresh");
+  const status = el("status");
+  const interval = el("interval").value;
+
+  button.disabled = true;
+  status.textContent = "Consultando";
+  status.className = "pill";
+  el("message").textContent = "Buscando dados públicos da Binance...";
+  el("scanner").textContent = "Recebendo dados";
+
+  try {
+    const [ticker, candles] = await Promise.all([
+      getJSON("/api/v3/ticker/price?symbol=ETHUSDT"),
+      getJSON("/api/v3/klines?symbol=ETHUSDT&interval=" +
+              interval + "&limit=10")
+    ]);
+
+    if (!Array.isArray(candles) || candles.length === 0) {
+      throw new Error("Nenhuma vela recebida.");
+    }
+
+    const last = candles[candles.length - 1];
+    const open = Number(last[1]);
+    const close = Number(last[4]);
+    const variation = ((close - open) / open) * 100;
+
+    el("price").textContent =
+      "US$ " + money.format(Number(ticker.price));
+
+    el("change").textContent =
+      (variation >= 0 ? "+" : "") +
+      variation.toFixed(3) + "%";
+
+    el("change").className = variation >= 0 ? "good" : "bad";
+
+    el("candles").innerHTML = "";
+
+    candles.slice(-5).reverse().forEach(candle => {
+      const openPrice = Number(candle[1]);
+      const high = Number(candle[2]);
+      const low = Number(candle[3]);
+      const closePrice = Number(candle[4]);
+      const volume = Number(candle[5]);
+      const direction = closePrice >= openPrice ? "Alta" : "Baixa";
+
+      const item = document.createElement("div");
+      item.className = "asset";
+
+      const line = document.createElement("div");
+      line.textContent =
+        new Date(Number(candle[0])).toLocaleString("pt-BR") +
+        " · " + direction +
+        " · Abertura: " + money.format(openPrice) +
+        " · Fechamento: " + money.format(closePrice) +
+        " · Máx: " + money.format(high) +
+        " · Mín: " + money.format(low) +
+        " · Volume: " + volume.toFixed(3);
+
+      item.appendChild(line);
+      el("candles").appendChild(item);
+    });
+
+    status.textContent = "Dados recebidos";
+    status.className = "pill good";
+    el("message").textContent =
+      "Consulta concluída. Dados públicos recebidos da Binance.";
+    el("scanner").textContent = "Dados disponíveis";
+    el("updated").textContent =
+      "Atualizado em " + new Date().toLocaleString("pt-BR");
+
+  } catch (error) {
+    status.textContent = "Falha na consulta";
+    status.className = "pill bad";
+    el("message").textContent =
+      "Não foi possível receber os dados: " + error.message +
+      ". Verifique a internet e tente novamente.";
+    el("scanner").textContent = "Sem dados";
+  } finally {
+    button.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
