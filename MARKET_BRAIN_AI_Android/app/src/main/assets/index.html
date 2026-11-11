@@ -5,174 +5,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#07111f">
-<title>MARKET BRAIN AI</title>
-
+<title>MARKET BRAIN AI 0.5.0</title>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
-
 <style>
-:root{
- color-scheme:dark;
- --bg:#07111f;
- --panel:#101e31;
- --line:#23364f;
- --muted:#91a4bb;
- --blue:#55b8ff;
- --green:#35d39a;
- --red:#ff8585;
- --amber:#ffc66d;
-}
+:root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--red:#ff8585;--amber:#ffc66d}
 *{box-sizing:border-box}
-body{
- margin:0;
- background:linear-gradient(160deg,#07111f,#0b1728);
- color:#eef5ff;
- font:15px system-ui,sans-serif;
-}
-main{max-width:900px;margin:auto;padding:18px 14px 40px}
-.top,.row{
- display:flex;
- justify-content:space-between;
- align-items:center;
- gap:12px;
-}
-.brand{font-weight:850;letter-spacing:1.3px;font-size:19px}
-.tag,.pill{
- font-size:11px;
- border-radius:99px;
- padding:6px 10px;
- background:#27364b;
- color:#c8d7e8;
-}
+body{margin:0;background:linear-gradient(160deg,#07111f,#0b1728);color:#eef5ff;font:15px system-ui,sans-serif}
+main{max-width:950px;margin:auto;padding:16px 12px 40px}
+.top,.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{font-size:19px;font-weight:850;letter-spacing:1px}
+.tag,.pill{font-size:11px;border-radius:99px;padding:6px 10px;background:#27364b;color:#c8d7e8}
 .tag{border:1px solid #8a6730;color:var(--amber)}
-h1{font-size:26px;margin:24px 0 7px}
+h1{font-size:25px;margin:22px 0 5px}
 .sub,.muted{color:var(--muted)}
-.sub{margin:0 0 18px}
+.sub{margin:0 0 16px}
+.card{background:rgba(16,30,49,.96);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+.section{font-weight:800;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.metric{background:#0b192b;border:1px solid var(--line);border-radius:12px;padding:11px;min-width:0}
+.metric b{display:block;font-size:16px;margin-top:5px;overflow-wrap:anywhere}
 .muted{font-size:12px}
-.card{
- background:rgba(16,30,49,.96);
- border:1px solid var(--line);
- border-radius:17px;
- padding:15px;
- margin:12px 0;
-}
-.section{font-weight:750;margin-bottom:12px}
-.grid{
- display:grid;
- grid-template-columns:repeat(2,minmax(0,1fr));
- gap:10px;
-}
-.metric{
- background:#0b192b;
- border:1px solid var(--line);
- border-radius:13px;
- padding:12px;
- min-width:0;
-}
-.metric b{
- display:block;
- font-size:16px;
- margin-top:5px;
- overflow-wrap:anywhere;
-}
-button,select{
- border:1px solid var(--line);
- border-radius:11px;
- padding:12px;
- background:#14263c;
- color:white;
- font-weight:700;
- font-size:14px;
-}
-button{
- background:#168bd2;
- border:0;
- width:100%;
- margin-top:12px;
-}
+.notice{font-size:12px;color:#b8c8da;line-height:1.6}
+.good{color:var(--green)}.bad{color:var(--red)}.neutral{color:var(--amber)}
+button,select{border:1px solid var(--line);border-radius:10px;padding:11px;background:#14263c;color:white;font-weight:700;font-size:14px}
+button{background:#168bd2;border:0;width:100%;margin-top:10px}
 button:disabled{opacity:.5}
-select{width:100%;margin-top:7px}
-.notice{font-size:12px;color:#b8c8da;line-height:1.5}
-.good{color:var(--green)}
-.bad{color:var(--red)}
-.neutral{color:var(--amber)}
-#chart{
- width:100%;
- height:350px;
- margin-top:10px;
-}
-.chart-info{
- display:flex;
- justify-content:space-between;
- gap:8px;
- flex-wrap:wrap;
- font-size:11px;
- color:var(--muted);
- margin-top:8px;
-}
-.asset{
- padding:10px 0;
- border-bottom:1px solid var(--line);
- font-size:12px;
- line-height:1.6;
-}
+select{width:100%;margin-top:6px}
+#chart{height:310px;width:100%;margin-top:10px}
+.asset{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.6}
 .asset:last-child{border:0}
-footer{
- color:#758ba4;
- font-size:11px;
- text-align:center;
- margin-top:22px;
- line-height:1.8;
-}
-@media(max-width:420px){
- main{padding:14px 10px 30px}
- h1{font-size:23px}
- #chart{height:290px}
- .metric b{font-size:14px}
-}
+.signal{border-left:4px solid var(--amber);padding:10px;background:#0b192b;border-radius:8px;margin:9px 0}
+.signal.buy{border-color:var(--green)}.signal.sell{border-color:var(--red)}
+.signal.wait{border-color:var(--amber)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}
+th{color:var(--muted)}
+footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-height:1.8}
+@media(max-width:420px){h1{font-size:22px}#chart{height:260px}.metric b{font-size:14px}}
 </style>
 </head>
-
 <body>
 <main>
-
 <div class="top">
  <div class="brand">◈ MARKET BRAIN AI</div>
- <span class="tag">INTELIGÊNCIA DE MERCADO</span>
+ <span class="tag">MOTOR 0.5.0</span>
 </div>
-
 <h1>Central de inteligência</h1>
-<p class="sub">Análise técnica experimental · Binance Spot</p>
+<p class="sub">Scanner seletivo · Binance Spot · Análise experimental</p>
 
 <div class="card">
  <div class="row">
   <b>Conexão com o mercado</b>
   <span class="pill" id="status">Aguardando</span>
  </div>
- <p class="notice" id="message">
- Toque em consultar para buscar dados públicos da Binance.
- </p>
- <button id="refresh" onclick="loadMarket()">Consultar mercado</button>
+ <p class="notice" id="message">Inicie o scanner para consultar dados públicos da Binance.</p>
+ <button id="start" onclick="startScanner()">Iniciar monitoramento</button>
+ <button id="stop" onclick="stopScanner()" disabled>Parar monitoramento</button>
  <p class="muted" id="updated">Nenhuma consulta realizada.</p>
 </div>
 
 <div class="card">
- <div class="section">Configuração da análise</div>
+ <div class="section">Configuração do gráfico</div>
  <div class="grid">
   <div class="metric">
    <span class="muted">Ativo</span>
    <select id="symbol">
-    <option value="BTCUSDT">BTC / USDT</option>
-    <option value="ETHUSDT" selected>ETH / USDT</option>
-    <option value="BNBUSDT">BNB / USDT</option>
-    <option value="SOLUSDT">SOL / USDT</option>
-    <option value="XRPUSDT">XRP / USDT</option>
-    <option value="ADAUSDT">ADA / USDT</option>
-    <option value="DOGEUSDT">DOGE / USDT</option>
-    <option value="LINKUSDT">LINK / USDT</option>
+    <option>BTCUSDT</option><option selected>ETHUSDT</option>
+    <option>BNBUSDT</option><option>SOLUSDT</option>
+    <option>XRPUSDT</option><option>ADAUSDT</option>
+    <option>DOGEUSDT</option><option>LINKUSDT</option>
    </select>
   </div>
   <div class="metric">
-   <span class="muted">Período gráfico</span>
+   <span class="muted">Período do gráfico</span>
    <select id="interval">
     <option value="1m">1 minuto</option>
     <option value="5m" selected>5 minutos</option>
@@ -185,478 +90,303 @@ footer{
    </select>
   </div>
  </div>
- <button id="apply" onclick="loadMarket()">Aplicar configuração</button>
+ <button onclick="loadChart()">Atualizar gráfico</button>
 </div>
 
 <div class="card">
  <div class="section">Gráfico profissional</div>
- <div class="row">
-  <b id="chartTitle">ETH / USDT</b>
-  <span class="pill">Velas japonesas</span>
- </div>
+ <b id="chartTitle">ETH / USDT</b>
  <div id="chart"></div>
- <div class="chart-info">
-  <span>Verde: alta</span>
-  <span>Vermelho: baixa</span>
-  <span>Dados públicos da Binance</span>
- </div>
+ <p class="muted">Velas japonesas · Volume · Dados Binance</p>
 </div>
 
 <div class="card">
- <div class="section">Preço e desempenho</div>
- <div class="grid">
-  <div class="metric">
-   <span class="muted">Último preço</span>
-   <b id="price">--</b>
-  </div>
-  <div class="metric">
-   <span class="muted">Variação da vela</span>
-   <b id="change">--</b>
-  </div>
- </div>
-</div>
-
-<div class="card">
- <div class="section">Indicadores técnicos</div>
- <div class="grid">
-  <div class="metric">
-   <span class="muted">EMA 9</span>
-   <b id="ema9">--</b>
-  </div>
-  <div class="metric">
-   <span class="muted">EMA 21</span>
-   <b id="ema21">--</b>
-  </div>
-  <div class="metric">
-   <span class="muted">RSI 14</span>
-   <b id="rsi">--</b>
-  </div>
-  <div class="metric">
-   <span class="muted">MACD</span>
-   <b id="macd">--</b>
-  </div>
-  <div class="metric">
-   <span class="muted">Sinal MACD</span>
-   <b id="macdSignal">--</b>
-  </div>
-  <div class="metric">
-   <span class="muted">Volume relativo</span>
-   <b id="volume">--</b>
-  </div>
- </div>
-</div>
-
-<div class="card">
- <div class="section">Inteligência do mercado</div>
+ <div class="section">Estado do cérebro</div>
  <div class="row">
-  <b id="bias">Aguardando análise</b>
-  <span class="pill">Experimental</span>
+  <b id="brainState">AGUARDANDO</b>
+  <span class="pill" id="score">Pontuação: --</span>
  </div>
- <p class="notice" id="analysis">
- Aguardando dados suficientes para análise.
- </p>
- <p class="muted" id="score">Pontuação: --</p>
+ <p class="notice" id="brainReason">Aguardando análise multitemporal.</p>
+ <div class="grid">
+  <div class="metric"><span class="muted">Preço atual</span><b id="price">--</b></div>
+  <div class="metric"><span class="muted">RSI 14</span><b id="rsi">--</b></div>
+  <div class="metric"><span class="muted">EMA 9 / 21</span><b id="emas">--</b></div>
+  <div class="metric"><span class="muted">Volume relativo</span><b id="volume">--</b></div>
+ </div>
 </div>
 
 <div class="card">
- <div class="section">Últimas velas fechadas</div>
- <div id="candles" class="notice">Aguardando consulta.</div>
+ <div class="section">Central de antecipação</div>
+ <div id="alertArea" class="signal wait">
+  <b>AGUARDANDO OPORTUNIDADE</b>
+  <p class="notice">Nenhuma entrada foi confirmada.</p>
+ </div>
+ <p class="notice">O pré-alerta indica um cenário em formação. Uma nova análise será realizada após cinco minutos. Não representa garantia de entrada nem horário previsto de execução.</p>
 </div>
 
 <div class="card">
  <div class="section">Scanner de oportunidades</div>
- <b id="scanner">Aguardando dados</b>
- <p class="notice">
- O scanner identifica alinhamentos técnicos. Só considera uma leitura
- forte quando os indicadores concordam. Não é uma previsão nem uma
- recomendação de compra ou venda.
- </p>
+ <div id="scannerState" class="muted">Scanner desligado.</div>
+ <table>
+  <thead><tr><th>Ativo</th><th>Direção</th><th>Pontos</th><th>Estado</th></tr></thead>
+  <tbody id="scannerRows"><tr><td colspan="4">Aguardando consulta.</td></tr></tbody>
+ </table>
+</div>
+
+<div class="card">
+ <div class="section">Histórico de alertas</div>
+ <div id="history" class="notice">Nenhum alerta registrado.</div>
 </div>
 
 <div class="card">
  <div class="section">Segurança operacional</div>
- <p class="notice">
- Esta versão utiliza somente dados públicos. Não possui acesso à conta,
- não envia ordens e não movimenta dinheiro. O modo automático ainda
- não está habilitado.
- </p>
+ <p class="notice">Esta versão usa somente dados públicos. Não acessa contas, não envia ordens e não movimenta dinheiro. A integração com Stelar Broker e qualquer modo automático ainda não estão habilitados.</p>
 </div>
 
-<footer>
- MARKET BRAIN AI · versão 0.4.0<br>
- Binance Spot · análise experimental · sem ordens automáticas
-</footer>
-
+<footer>MARKET BRAIN AI · 0.5.0<br>Motor experimental · Sem execução automática</footer>
 </main>
 
 <script>
 "use strict";
 
 const API="https://data-api.binance.vision";
-
-const money=new Intl.NumberFormat("pt-BR",{
- minimumFractionDigits:2,
- maximumFractionDigits:6
-});
-
-let chart=null;
-let candleSeries=null;
-let volumeSeries=null;
-
-function el(id){
- return document.getElementById(id);
-}
-
-function fmt(value){
- return money.format(value);
-}
-
-function setValue(id,value){
- el(id).textContent=value;
-}
-
-function setStatus(message,kind="neutral"){
- setValue("status",message);
- el("status").className="pill "+kind;
-}
+const SYMBOLS=["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","LINKUSDT"];
+const SCAN_INTERVALS=["5m","15m","1h"];
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString("pt-BR",{maximumFractionDigits:6});
+let chart=null,candleSeries=null,volumeSeries=null;
+let running=false,timer=null,scanBusy=false;
+let previousAlerts={};
+let historyItems=[];
 
 async function getJSON(path){
- const response=await fetch(API+path);
-
- if(!response.ok){
-  throw new Error("Resposta HTTP "+response.status);
- }
-
- return response.json();
+ const r=await fetch(API+path);
+ if(!r.ok)throw new Error("Binance HTTP "+r.status);
+ return r.json();
 }
-
-function initChart(){
- const container=el("chart");
-
- if(!window.LightweightCharts){
-  throw new Error("Biblioteca de gráficos não carregada.");
+function setStatus(t){$("status").textContent=t}
+function ema(v,p){
+ if(v.length<p)return null;
+ let avg=v.slice(0,p).reduce((a,b)=>a+b,0)/p;
+ const out=Array(p-1).fill(null);
+ out.push(avg);
+ const k=2/(p+1);
+ for(let i=p;i<v.length;i++){
+  avg=v[i]*k+avg*(1-k);out.push(avg);
  }
-
- chart=LightweightCharts.createChart(container,{
-  width:container.clientWidth,
-  height:container.clientHeight,
-  layout:{
-   background:{color:"#101e31"},
-   textColor:"#b8c8da"
-  },
-  grid:{
-   vertLines:{color:"#1c3047"},
-   horzLines:{color:"#1c3047"}
-  },
-  rightPriceScale:{
-   borderColor:"#344b65"
-  },
-  timeScale:{
-   borderColor:"#344b65",
-   timeVisible:true,
-   secondsVisible:false
-  },
-  crosshair:{
-   mode:LightweightCharts.CrosshairMode.Normal
-  }
- });
-
- candleSeries=chart.addCandlestickSeries({
-  upColor:"#35d39a",
-  downColor:"#ff8585",
-  borderUpColor:"#35d39a",
-  borderDownColor:"#ff8585",
-  wickUpColor:"#35d39a",
-  wickDownColor:"#ff8585"
- });
-
- volumeSeries=chart.addHistogramSeries({
-  priceFormat:{type:"volume"},
-  priceScaleId:"",
-  scaleMargins:{
-   top:0.82,
-   bottom:0
-  }
- });
-
- chart.timeScale().fitContent();
-
- window.addEventListener("resize",()=>{
-  if(chart){
-   chart.applyOptions({
-    width:container.clientWidth
-   });
-  }
- });
+ return out;
 }
-
-function ema(values,period){
- if(values.length<period)return null;
-
- const result=[];
- let average=0;
-
- for(let i=0;i<period;i++){
-  average+=values[i];
+function rsi(v,p=14){
+ if(v.length<=p)return null;
+ let gain=0,loss=0;
+ for(let i=1;i<=p;i++){
+  const d=v[i]-v[i-1];
+  if(d>0)gain+=d;else loss-=d;
  }
-
- let previous=average/period;
- result[period-1]=previous;
-
- const multiplier=2/(period+1);
-
- for(let i=period;i<values.length;i++){
-  previous=(values[i]-previous)*multiplier+previous;
-  result[i]=previous;
+ let ag=gain/p,al=loss/p;
+ for(let i=p+1;i<v.length;i++){
+  const d=v[i]-v[i-1];
+  ag=(ag*(p-1)+Math.max(d,0))/p;
+  al=(al*(p-1)+Math.max(-d,0))/p;
  }
-
- return result;
+ return al===0?100:100-100/(1+ag/al);
 }
-
-function rsi(values,period=14){
- if(values.length<=period)return null;
-
- let gains=0;
- let losses=0;
-
- for(let i=1;i<=period;i++){
-  const change=values[i]-values[i-1];
-
-  if(change>0)gains+=change;
-  else losses-=change;
- }
-
- let avgGain=gains/period;
- let avgLoss=losses/period;
-
- for(let i=period+1;i<values.length;i++){
-  const change=values[i]-values[i-1];
-
-  avgGain=(avgGain*(period-1)+Math.max(change,0))/period;
-  avgLoss=(avgLoss*(period-1)+Math.max(-change,0))/period;
- }
-
- if(avgLoss===0)return 100;
-
- return 100-(100/(1+avgGain/avgLoss));
+function macd(v){
+ const a=ema(v,12),b=ema(v,26);
+ if(!a||!b)return null;
+ const line=v.map((_,i)=>a[i]!==null&&b[i]!==null?a[i]-b[i]:null).filter(x=>x!==null);
+ const sig=ema(line,9);
+ if(!sig)return null;
+ return {line:line.at(-1),signal:sig.at(-1)};
 }
-
-function macdData(values){
- const fast=ema(values,12);
- const slow=ema(values,26);
-
- if(!fast||!slow)return null;
-
- const line=[];
-
- for(let i=0;i<values.length;i++){
-  if(fast[i]!==undefined&&slow[i]!==undefined){
-   line.push(fast[i]-slow[i]);
-  }
- }
-
- if(line.length<9)return null;
-
- const signal=ema(line,9);
-
- if(!signal)return null;
-
- return{
-  value:line[line.length-1],
-  signal:signal[signal.length-1]
+function parseCandles(raw){
+ const closed=raw.filter(c=>Number(c[6])<Date.now());
+ return {
+  raw:closed,
+  close:closed.map(c=>Number(c[4])),
+  volume:closed.map(c=>Number(c[5]))
  };
 }
-
-function drawChart(candles){
- if(!chart||!candleSeries||!volumeSeries){
-  initChart();
- }
-
- const chartCandles=candles.map(c=>({
-  time:Math.floor(Number(c[0])/1000),
-  open:Number(c[1]),
-  high:Number(c[2]),
-  low:Number(c[3]),
-  close:Number(c[4])
- }));
-
- const chartVolumes=candles.map(c=>({
-  time:Math.floor(Number(c[0])/1000),
-  value:Number(c[5]),
-  color:Number(c[4])>=Number(c[1])
-   ?"rgba(53,211,154,.45)"
-   :"rgba(255,133,133,.45)"
- }));
-
- candleSeries.setData(chartCandles);
- volumeSeries.setData(chartVolumes);
- chart.timeScale().fitContent();
+async function fetchFrame(symbol,interval){
+ const raw=await getJSON("/api/v3/klines?symbol="+symbol+"&interval="+interval+"&limit=120");
+ const data=parseCandles(raw);
+ if(data.close.length<35)throw new Error("Histórico insuficiente");
+ const e9=ema(data.close,9),e21=ema(data.close,21);
+ const rr=rsi(data.close),mm=macd(data.close);
+ const n=data.close.length;
+ const avg=data.volume.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
+ const rv=avg>0?data.volume.at(-1)/avg:0;
+ return {
+  direction:e9[n-1]>e21[n-1]&&rr>50&&mm.line>mm.signal?"BUY":
+   e9[n-1]<e21[n-1]&&rr<50&&mm.line<mm.signal?"SELL":"NEUTRAL",
+  rsi:rr,ema9:e9[n-1],ema21:e21[n-1],
+  macd:mm,relativeVolume:rv,price:data.close.at(-1),raw:data.raw
+ };
 }
-
-function updateAnalysis(closes,volumes,last){
- const e9=ema(closes,9);
- const e21=ema(closes,21);
- const r=rsi(closes,14);
- const m=macdData(closes);
-
- if(!e9||!e21||r===null||!m){
-  throw new Error("Dados insuficientes para calcular indicadores.");
- }
-
- const ema9Value=e9[e9.length-1];
- const ema21Value=e21[e21.length-1];
-
- const previousVolumes=volumes.slice(-21,-1);
- const averageVolume=previousVolumes.reduce((a,b)=>a+b,0)/
-  Math.max(previousVolumes.length,1);
-
- const relativeVolume=averageVolume>0
-  ?volumes[volumes.length-1]/averageVolume:0;
-
- setValue("ema9","US$ "+fmt(ema9Value));
- setValue("ema21","US$ "+fmt(ema21Value));
- setValue("rsi",r.toFixed(2));
- setValue("macd",m.value.toFixed(6));
- setValue("macdSignal",m.signal.toFixed(6));
- setValue("volume",relativeVolume.toFixed(2)+"x da média");
-
- const bullishTrend=ema9Value>ema21Value;
- const bullishMomentum=r>50;
- const bullishMacd=m.value>m.signal;
-
+async function analyzeSymbol(symbol){
+ const frames=await Promise.all(SCAN_INTERVALS.map(i=>fetchFrame(symbol,i)));
+ const weights=[1,2,3];
  let score=0;
- score+=bullishTrend?1:-1;
- score+=bullishMomentum?1:-1;
- score+=bullishMacd?1:-1;
-
- let title="Neutro — aguardar";
- let explanation="Os indicadores não apresentam alinhamento suficiente.";
- let css="neutral";
- let scanner="Nenhuma oportunidade de alta qualidade identificada.";
-
- if(score===3){
-  title="Viés comprador";
-  explanation="EMA 9 acima da EMA 21, RSI acima de 50 e MACD acima da linha de sinal. Há alinhamento técnico positivo, mas não garantia de alta.";
-  css="good";
-  scanner="Alinhamento comprador identificado. Aguardar confirmação adicional.";
- }else if(score===-3){
-  title="Viés vendedor";
-  explanation="EMA 9 abaixo da EMA 21, RSI abaixo de 50 e MACD abaixo da linha de sinal. Há alinhamento técnico negativo, mas não garantia de queda.";
-  css="bad";
-  scanner="Alinhamento vendedor identificado. Aguardar confirmação adicional.";
- }
-
- setValue("bias",title);
- el("bias").className=css;
- setValue("analysis",explanation+
-  " Volume relativo: "+relativeVolume.toFixed(2)+" vezes a média.");
-
- setValue("score","Pontuação técnica: "+score+" de 3");
- setValue("scanner",scanner);
-
- return relativeVolume;
+ frames.forEach((f,i)=>{
+  score+=(f.direction==="BUY"?1:f.direction==="SELL"?-1:0)*weights[i];
+ });
+ const direction=score>=5?"BUY":score<=-5?"SELL":"WAIT";
+ const aligned=frames.filter(f=>f.direction===direction).length;
+ const strongest=frames[2];
+ const volumeOK=strongest.relativeVolume>=0.8;
+ const rsiOK=strongest.rsi>35&&strongest.rsi<70;
+ const quality=Math.round(Math.min(100,Math.abs(score)/6*75+(volumeOK?15:0)+(rsiOK?10:0)));
+ const valid=direction!=="WAIT"&&aligned>=2&&volumeOK&&rsiOK&&quality>=75;
+ return {symbol,frames,score,direction,quality,valid,price:strongest.price};
 }
-
-function showCandles(candles){
- el("candles").innerHTML="";
-
- candles.slice(-5).reverse().forEach(c=>{
-  const item=document.createElement("div");
-  item.className="asset";
-
-  const open=Number(c[1]);
-  const close=Number(c[4]);
-  const direction=close>=open?"Alta":"Baixa";
-
-  item.textContent=
-   new Date(Number(c[0])).toLocaleString("pt-BR")+
-   " · "+direction+
-   " · Abertura: "+fmt(open)+
-   " · Fechamento: "+fmt(close)+
-   " · Máx: "+fmt(Number(c[2]))+
-   " · Mín: "+fmt(Number(c[3]));
-
-  el("candles").appendChild(item);
+function renderScanner(results){
+ $("scannerRows").innerHTML="";
+ results.forEach(r=>{
+  const tr=document.createElement("tr");
+  const direction=r.direction==="BUY"?"COMPRA":r.direction==="SELL"?"VENDA":"AGUARDAR";
+  [r.symbol,direction,r.quality+"/100",r.valid?"Pré-alerta possível":"Sem oportunidade"].forEach(v=>{
+   const td=document.createElement("td");td.textContent=v;tr.appendChild(td);
+  });
+  $("scannerRows").appendChild(tr);
  });
 }
-
-async function loadMarket(){
- const button=el("refresh");
- const apply=el("apply");
-
- button.disabled=true;
- apply.disabled=true;
-
- setStatus("Consultando");
- setValue("message","Buscando dados públicos da Binance...");
- setValue("scanner","Recebendo dados...");
-
+function addHistory(text){
+ historyItems.unshift(new Date().toLocaleTimeString("pt-BR")+" · "+text);
+ historyItems=historyItems.slice(0,8);
+ $("history").innerHTML="";
+ historyItems.forEach(t=>{
+  const d=document.createElement("div");d.className="asset";d.textContent=t;$("history").appendChild(d);
+ });
+}
+function showWait(reason){
+ $("brainState").textContent="AGUARDAR";
+ $("brainState").className="neutral";
+ $("brainReason").textContent=reason;
+ $("alertArea").className="signal wait";
+ $("alertArea").innerHTML="<b>AGUARDAR — SEM ENTRADA</b><p class='notice'>Nenhuma oportunidade atende aos critérios neste momento.</p>";
+}
+function showCandidate(r){
+ const direction=r.direction==="BUY"?"COMPRA":"VENDA";
+ $("brainState").textContent="PRÉ-ALERTA: "+direction;
+ $("brainState").className=r.direction==="BUY"?"good":"bad";
+ $("score").textContent="Qualidade: "+r.quality+"/100";
+ $("brainReason").textContent="Alinhamento observado em "+r.frames.map((f,i)=>SCAN_INTERVALS[i]).join(", ")+". Cenário ainda precisa de confirmação.";
+ $("alertArea").className="signal "+(r.direction==="BUY"?"buy":"sell");
+ $("alertArea").innerHTML="<b>PRÉ-ALERTA DE "+direction+"</b><p class='notice'>"+r.symbol+" · Qualidade técnica: "+r.quality+"/100</p><p class='notice'>Reavaliar em 5 minutos. Não é ordem nem confirmação de entrada.</p>";
+ addHistory("Pré-alerta "+direction+" em "+r.symbol+" ("+r.quality+"/100)");
+}
+async function scan(){
+ if(scanBusy||!running)return;
+ scanBusy=true;
+ $("scannerState").textContent="Analisando ativos e períodos...";
+ setStatus("Analisando");
  try{
-  const symbol=el("symbol").value;
-  const interval=el("interval").value;
-
-  const [ticker,raw]=await Promise.all([
-   getJSON("/api/v3/ticker/price?symbol="+symbol),
-   getJSON("/api/v3/klines?symbol="+symbol+
-    "&interval="+interval+"&limit=200")
-  ]);
-
-  const now=Date.now();
-  const closed=raw.filter(c=>Number(c[6])<now);
-
-  if(closed.length<35){
-   throw new Error("Dados insuficientes para os indicadores.");
+  const results=[];
+  for(const symbol of SYMBOLS){
+   if(!running)break;
+   try{results.push(await analyzeSymbol(symbol))}
+   catch(e){results.push({symbol,direction:"WAIT",quality:0,valid:false,error:e.message})}
   }
-
-  const closes=closed.map(c=>Number(c[4]));
-  const volumes=closed.map(c=>Number(c[5]));
-
-  const last=closed[closed.length-1];
-  const open=Number(last[1]);
-  const close=Number(last[4]);
-  const variation=((close-open)/open)*100;
-
-  setValue("price","US$ "+fmt(Number(ticker.price)));
-  setValue("change",(variation>=0?"+":"")+
-   variation.toFixed(3)+"%");
-
-  el("change").className=variation>=0?"good":"bad";
-
-  setValue("chartTitle",symbol.replace("USDT"," / USDT"));
-
-  drawChart(closed);
-
-  updateAnalysis(closes,volumes,last);
-  showCandles(closed);
-
-  setStatus("Dados recebidos","good");
-
-  setValue("message",
-   "Consulta concluída. Indicadores calculados com velas fechadas.");
-
-  setValue("updated",
-   "Atualizado em "+new Date().toLocaleString("pt-BR"));
-
- }catch(error){
-  setStatus("Falha na consulta","bad");
-  setValue("message","Não foi possível concluir: "+error.message);
-  setValue("scanner","Sem análise disponível");
-  setValue("analysis","Aguardando uma consulta bem-sucedida.");
+  if(!running)return;
+  renderScanner(results);
+  const candidates=results.filter(r=>r.valid).sort((a,b)=>b.quality-a.quality);
+  const best=candidates[0];
+  if(best){
+   const key=best.symbol+best.direction;
+   const prior=previousAlerts[key]||0;
+   if(Date.now()-prior>5*60*1000){
+    previousAlerts[key]=Date.now();
+    showCandidate(best);
+   }else{
+    showWait("Cenário em observação. Aguardar nova avaliação e confirmação dos critérios.");
+   }
+  }else{
+   showWait("Nenhum ativo apresentou alinhamento técnico suficiente. O cérebro permanece aguardando.");
+  }
+  const selected=$("symbol").value;
+  const chosen=results.find(r=>r.symbol===selected);
+  if(chosen){
+   const f=chosen.frames?.[2];
+   if(f){
+    $("price").textContent="US$ "+fmt(f.price);
+    $("rsi").textContent=f.rsi.toFixed(2);
+    $("emas").textContent=fmt(f.ema9)+" / "+fmt(f.ema21);
+    $("volume").textContent=f.relativeVolume.toFixed(2)+"x";
+   }
+  }
+  $("updated").textContent="Última análise: "+new Date().toLocaleString("pt-BR");
+  $("scannerState").textContent="Monitoramento ativo · "+results.length+" ativos consultados.";
+  setStatus("Conectado");
+ }catch(e){
+  setStatus("Falha");
+  $("message").textContent="Erro de consulta: "+e.message;
  }finally{
-  button.disabled=false;
-  apply.disabled=false;
+  scanBusy=false;
  }
 }
-
-try{
- initChart();
-}catch(error){
- setValue("message",
-  "O gráfico será inicializado quando a biblioteca estiver disponível.");
+function initChart(){
+ if(!window.LightweightCharts)throw new Error("Biblioteca do gráfico não carregada.");
+ const c=$("chart");
+ chart=LightweightCharts.createChart(c,{
+  width:c.clientWidth,height:c.clientHeight,
+  layout:{background:{color:"#101e31"},textColor:"#b8c8da"},
+  grid:{vertLines:{color:"#1c3047"},horzLines:{color:"#1c3047"}},
+  rightPriceScale:{borderColor:"#344b65"},
+  timeScale:{borderColor:"#344b65",timeVisible:true},
+ });
+ candleSeries=chart.addCandlestickSeries({
+  upColor:"#35d39a",downColor:"#ff8585",
+  borderUpColor:"#35d39a",borderDownColor:"#ff8585",
+  wickUpColor:"#35d39a",wickDownColor:"#ff8585"
+ });
+ volumeSeries=chart.addHistogramSeries({
+  priceFormat:{type:"volume"},priceScaleId:"",
+  scaleMargins:{top:.82,bottom:0}
+ });
+ window.addEventListener("resize",()=>chart.applyOptions({width:c.clientWidth}));
 }
-
-setValue("chartTitle","ETH / USDT");
+async function loadChart(){
+ try{
+  if(!chart)initChart();
+  const symbol=$("symbol").value,interval=$("interval").value;
+  const raw=await getJSON("/api/v3/klines?symbol="+symbol+"&interval="+interval+"&limit=150");
+  const data=parseCandles(raw).raw;
+  candleSeries.setData(data.map(c=>({
+   time:Math.floor(Number(c[0])/1000),
+   open:+c[1],high:+c[2],low:+c[3],close:+c[4]
+  })));
+  volumeSeries.setData(data.map(c=>({
+   time:Math.floor(Number(c[0])/1000),value:+c[5],
+   color:+c[4]>=+c[1]?"rgba(53,211,154,.45)":"rgba(255,133,133,.45)"
+  })));
+  chart.timeScale().fitContent();
+  $("chartTitle").textContent=symbol.replace("USDT"," / USDT");
+ }catch(e){
+  $("message").textContent="Erro no gráfico: "+e.message;
+ }
+}
+function startScanner(){
+ if(running)return;
+ running=true;
+ $("start").disabled=true;$("stop").disabled=false;
+ $("message").textContent="Monitoramento iniciado. Consultas periódicas de dados públicos.";
+ scan();
+ timer=setInterval(scan,60000);
+ loadChart();
+}
+function stopScanner(){
+ running=false;
+ if(timer)clearInterval(timer);
+ timer=null;
+ $("start").disabled=false;$("stop").disabled=true;
+ setStatus("Pausado");
+ $("scannerState").textContent="Monitoramento pausado.";
+ showWait("Monitoramento interrompido pelo usuário.");
+}
+$("symbol").addEventListener("change",()=>{if(running)loadChart()});
+$("interval").addEventListener("change",()=>{if(running)loadChart()});
+try{initChart()}catch(e){$("message").textContent="O gráfico será carregado quando a biblioteca estiver disponível."}
 </script>
-
 </body>
-</html>
+   </html>
+ 
