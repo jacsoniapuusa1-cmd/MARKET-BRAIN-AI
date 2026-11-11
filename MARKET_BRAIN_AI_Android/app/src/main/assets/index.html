@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#07111f">
 <title>MARKET BRAIN AI</title>
 <style>
-:root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--amber:#ffc66d}
+:root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--red:#ff8585;--amber:#ffc66d}
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(160deg,#07111f,#0b1728);color:#eef5ff;font:15px system-ui,sans-serif}
 main{max-width:760px;margin:auto;padding:20px 16px 40px}
@@ -20,7 +20,6 @@ h1{font-size:27px;margin:24px 0 7px}
 .muted{font-size:12px}
 .card{background:rgba(16,30,49,.94);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0}
 .section{font-weight:750;margin-bottom:12px}
-.big{font-size:27px;font-weight:850;color:var(--blue);margin:7px 0}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .metric{background:#0b192b;border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}
 .metric b{display:block;font-size:17px;margin-top:5px;overflow-wrap:anywhere}
@@ -32,7 +31,7 @@ select{width:100%;margin-top:8px}
 .asset{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
 .asset:last-child{border:0}
 footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
-.good{color:var(--green)}.bad{color:#ff8585}
+.good{color:var(--green)}.bad{color:var(--red)}.neutral{color:var(--amber)}
 </style>
 </head>
 <body>
@@ -43,14 +42,14 @@ footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
 </div>
 
 <h1>Central de inteligência</h1>
-<p class="sub">Consulta de mercado · dados públicos · sem ordens automáticas</p>
+<p class="sub">Análise técnica experimental · Binance Spot · sem ordens automáticas</p>
 
 <div class="card">
  <div class="row">
-  <b>Conexão com dados da Binance</b>
+  <b>Conexão com a Binance</b>
   <span class="pill" id="status">Aguardando</span>
  </div>
- <p class="notice" id="message">Toque em consultar para buscar dados públicos do mercado.</p>
+ <p class="notice" id="message">Toque em consultar para buscar dados públicos.</p>
  <button id="refresh" onclick="loadMarket()">Consultar mercado</button>
  <p class="muted" id="updated">Nenhuma consulta realizada.</p>
 </div>
@@ -58,14 +57,8 @@ footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
 <div class="card">
  <div class="section">Ativo em análise</div>
  <div class="grid">
-  <div class="metric">
-   <span class="muted">Par</span>
-   <b>ETH/USDT</b>
-  </div>
-  <div class="metric">
-   <span class="muted">Último preço</span>
-   <b id="price">--</b>
-  </div>
+  <div class="metric"><span class="muted">Par</span><b>ETH/USDT</b></div>
+  <div class="metric"><span class="muted">Último preço</span><b id="price">--</b></div>
   <div class="metric">
    <span class="muted">Período das velas</span>
    <select id="interval" onchange="loadMarket()">
@@ -73,136 +66,204 @@ footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
     <option value="5m" selected>5 minutos</option>
    </select>
   </div>
-  <div class="metric">
-   <span class="muted">Variação da última vela</span>
-   <b id="change">--</b>
-  </div>
+  <div class="metric"><span class="muted">Variação da última vela fechada</span><b id="change">--</b></div>
  </div>
 </div>
 
 <div class="card">
- <div class="section">Últimas velas recebidas</div>
- <div id="candles" class="notice">Aguardando consulta dos dados.</div>
+ <div class="section">Indicadores técnicos</div>
+ <div class="grid">
+  <div class="metric"><span class="muted">EMA 9</span><b id="ema9">--</b></div>
+  <div class="metric"><span class="muted">EMA 21</span><b id="ema21">--</b></div>
+  <div class="metric"><span class="muted">RSI 14</span><b id="rsi">--</b></div>
+  <div class="metric"><span class="muted">MACD</span><b id="macd">--</b></div>
+  <div class="metric"><span class="muted">Sinal MACD</span><b id="macdSignal">--</b></div>
+  <div class="metric"><span class="muted">Volume relativo</span><b id="volume">--</b></div>
+ </div>
+</div>
+
+<div class="card">
+ <div class="section">Leitura do mercado</div>
+ <div class="row">
+  <b id="bias">Aguardando análise</b>
+  <span class="pill">Experimental</span>
+ </div>
+ <p class="notice" id="analysis">Os indicadores serão calculados após a consulta.</p>
+</div>
+
+<div class="card">
+ <div class="section">Últimas velas fechadas</div>
+ <div id="candles" class="notice">Aguardando consulta.</div>
 </div>
 
 <div class="card">
  <div class="section">Estado do scanner</div>
- <div class="row">
-  <b id="scanner">Aguardando dados</b>
-  <span class="pill">Somente análise</span>
- </div>
- <p class="notice">
-  Esta etapa consulta preços e candles públicos. Ainda não é um scanner
-  de sinais, não prevê resultados e não realiza compras ou vendas.
- </p>
+ <b id="scanner">Aguardando dados</b>
+ <p class="notice">Esta versão calcula indicadores técnicos básicos a partir de dados públicos. A leitura é experimental, não é uma previsão nem uma recomendação financeira. Nenhuma compra ou venda é realizada.</p>
 </div>
 
 <footer>
-MARKET BRAIN AI · versão 0.2.0<br>
-Dados públicos da Binance Spot. Não é recomendação financeira.
+MARKET BRAIN AI · versão 0.3.0<br>
+Binance Spot · análise experimental · sem ordens automáticas
 </footer>
 </main>
 
 <script>
-const API = "https://data-api.binance.vision";
-const money = new Intl.NumberFormat("pt-BR", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 4
-});
+const API="https://data-api.binance.vision";
+const money=new Intl.NumberFormat("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:4});
 
-function el(id) {
-  return document.getElementById(id);
+function el(id){return document.getElementById(id)}
+function fmt(value){return money.format(value)}
+
+async function getJSON(path){
+ const response=await fetch(API+path);
+ if(!response.ok)throw new Error("Resposta HTTP "+response.status);
+ return response.json();
 }
 
-async function getJSON(path) {
-  const response = await fetch(API + path);
-  if (!response.ok) {
-    throw new Error("Resposta HTTP " + response.status);
-  }
-  return response.json();
+function ema(values,period){
+ if(values.length<period)return null;
+ const k=2/(period+1);
+ let result=values[0];
+ for(let i=1;i<values.length;i++)result=values[i]*k+result*(1-k);
+ return result;
 }
 
-async function loadMarket() {
-  const button = el("refresh");
-  const status = el("status");
-  const interval = el("interval").value;
+function rsi(values,period=14){
+ if(values.length<=period)return null;
+ let gains=0,losses=0;
+ for(let i=values.length-period;i<values.length;i++){
+  const change=values[i]-values[i-1];
+  if(change>0)gains+=change;
+  else losses-=change;
+ }
+ const avgGain=gains/period;
+ const avgLoss=losses/period;
+ if(avgLoss===0)return 100;
+ return 100-(100/(1+avgGain/avgLoss));
+}
 
-  button.disabled = true;
-  status.textContent = "Consultando";
-  status.className = "pill";
-  el("message").textContent = "Buscando dados públicos da Binance...";
-  el("scanner").textContent = "Recebendo dados";
+function macdData(values){
+ if(values.length<35)return null;
+ const fast=[],slow=[];
+ for(let i=0;i<values.length;i++){
+  fast.push(ema(values.slice(0,i+1),12));
+  slow.push(ema(values.slice(0,i+1),26));
+ }
+ const line=[];
+ for(let i=0;i<values.length;i++){
+  if(fast[i]!==null&&slow[i]!==null)line.push(fast[i]-slow[i]);
+ }
+ if(line.length<9)return null;
+ return {value:line[line.length-1],signal:ema(line,9)};
+}
 
-  try {
-    const [ticker, candles] = await Promise.all([
-      getJSON("/api/v3/ticker/price?symbol=ETHUSDT"),
-      getJSON("/api/v3/klines?symbol=ETHUSDT&interval=" +
-              interval + "&limit=10")
-    ]);
+function setValue(id,value){
+ el(id).textContent=value;
+}
 
-    if (!Array.isArray(candles) || candles.length === 0) {
-      throw new Error("Nenhuma vela recebida.");
-    }
+async function loadMarket(){
+ const button=el("refresh");
+ button.disabled=true;
+ el("status").textContent="Consultando";
+ el("message").textContent="Buscando dados públicos da Binance...";
+ el("scanner").textContent="Recebendo dados";
 
-    const last = candles[candles.length - 1];
-    const open = Number(last[1]);
-    const close = Number(last[4]);
-    const variation = ((close - open) / open) * 100;
+ try{
+  const interval=el("interval").value;
+  const [ticker,raw]=await Promise.all([
+   getJSON("/api/v3/ticker/price?symbol=ETHUSDT"),
+   getJSON("/api/v3/klines?symbol=ETHUSDT&interval="+interval+"&limit=100")
+  ]);
 
-    el("price").textContent =
-      "US$ " + money.format(Number(ticker.price));
+  const now=Date.now();
+  const closed=raw.filter(c=>Number(c[6])<now);
+  if(closed.length<35)throw new Error("Dados insuficientes para os indicadores.");
 
-    el("change").textContent =
-      (variation >= 0 ? "+" : "") +
-      variation.toFixed(3) + "%";
+  const closes=closed.map(c=>Number(c[4]));
+  const volumes=closed.map(c=>Number(c[5]));
+  const last=closed[closed.length-1];
+  const open=Number(last[1]);
+  const close=Number(last[4]);
+  const variation=((close-open)/open)*100;
 
-    el("change").className = variation >= 0 ? "good" : "bad";
+  const e9=ema(closes.slice(-9),9);
+  const e21=ema(closes.slice(-21),21);
+  const r=rsi(closes,14);
+  const m=macdData(closes);
 
-    el("candles").innerHTML = "";
+  const previousVolumes=volumes.slice(-21,-1);
+  const averageVolume=previousVolumes.reduce((a,b)=>a+b,0)/previousVolumes.length;
+  const relativeVolume=averageVolume>0?volumes[volumes.length-1]/averageVolume:0;
 
-    candles.slice(-5).reverse().forEach(candle => {
-      const openPrice = Number(candle[1]);
-      const high = Number(candle[2]);
-      const low = Number(candle[3]);
-      const closePrice = Number(candle[4]);
-      const volume = Number(candle[5]);
-      const direction = closePrice >= openPrice ? "Alta" : "Baixa";
+  setValue("price","US$ "+fmt(Number(ticker.price)));
+  setValue("change",(variation>=0?"+":"")+variation.toFixed(3)+"%");
+  el("change").className=variation>=0?"good":"bad";
+  setValue("ema9","US$ "+fmt(e9));
+  setValue("ema21","US$ "+fmt(e21));
+  setValue("rsi",r.toFixed(2));
+  setValue("macd",m?m.value.toFixed(4):"--");
+  setValue("macdSignal",m?m.signal.toFixed(4):"--");
+  setValue("volume",relativeVolume.toFixed(2)+"x da média");
 
-      const item = document.createElement("div");
-      item.className = "asset";
+  const trend=e9>e21;
+  const momentum=r>50;
+  const macdPositive=m&&m.value>m.signal;
+  let score=0;
+  if(trend)score++;
+  else score--;
+  if(momentum)score++;
+  else score--;
+  if(macdPositive)score++;
+  else score--;
 
-      const line = document.createElement("div");
-      line.textContent =
-        new Date(Number(candle[0])).toLocaleString("pt-BR") +
-        " · " + direction +
-        " · Abertura: " + money.format(openPrice) +
-        " · Fechamento: " + money.format(closePrice) +
-        " · Máx: " + money.format(high) +
-        " · Mín: " + money.format(low) +
-        " · Volume: " + volume.toFixed(3);
+  let title="Neutro — aguardar";
+  let explanation="Os indicadores estão mistos. Não há alinhamento suficiente.";
+  let css="neutral";
 
-      item.appendChild(line);
-      el("candles").appendChild(item);
-    });
-
-    status.textContent = "Dados recebidos";
-    status.className = "pill good";
-    el("message").textContent =
-      "Consulta concluída. Dados públicos recebidos da Binance.";
-    el("scanner").textContent = "Dados disponíveis";
-    el("updated").textContent =
-      "Atualizado em " + new Date().toLocaleString("pt-BR");
-
-  } catch (error) {
-    status.textContent = "Falha na consulta";
-    status.className = "pill bad";
-    el("message").textContent =
-      "Não foi possível receber os dados: " + error.message +
-      ". Verifique a internet e tente novamente.";
-    el("scanner").textContent = "Sem dados";
-  } finally {
-    button.disabled = false;
+  if(score===3){
+   title="Viés comprador";
+   explanation="EMA 9 acima da EMA 21, RSI acima de 50 e MACD acima da linha de sinal. Isso não garante continuidade da alta.";
+   css="good";
+  }else if(score===-3){
+   title="Viés vendedor";
+   explanation="EMA 9 abaixo da EMA 21, RSI abaixo de 50 e MACD abaixo da linha de sinal. Isso não garante continuidade da queda.";
+   css="bad";
   }
+
+  setValue("bias",title);
+  el("bias").className=css;
+  setValue("analysis",explanation+" Volume relativo: "+relativeVolume.toFixed(2)+" vezes a média das 20 velas anteriores.");
+  el("candles").innerHTML="";
+
+  closed.slice(-5).reverse().forEach(c=>{
+   const item=document.createElement("div");
+   item.className="asset";
+   const direction=Number(c[4])>=Number(c[1])?"Alta":"Baixa";
+   item.textContent=new Date(Number(c[0])).toLocaleString("pt-BR")+
+    " · "+direction+
+    " · Abertura: "+fmt(Number(c[1]))+
+    " · Fechamento: "+fmt(Number(c[4]))+
+    " · Máx: "+fmt(Number(c[2]))+
+    " · Mín: "+fmt(Number(c[3]))+
+    " · Volume: "+Number(c[5]).toFixed(3);
+   el("candles").appendChild(item);
+  });
+
+  el("status").textContent="Dados recebidos";
+  el("status").className="pill good";
+  el("message").textContent="Consulta concluída. Indicadores calculados com candles fechados.";
+  el("scanner").textContent="Análise técnica disponível";
+  el("updated").textContent="Atualizado em "+new Date().toLocaleString("pt-BR");
+
+ }catch(error){
+  el("status").textContent="Falha na consulta";
+  el("status").className="pill bad";
+  el("message").textContent="Não foi possível concluir a análise: "+error.message;
+  el("scanner").textContent="Sem análise";
+ }finally{
+  button.disabled=false;
+ }
 }
 </script>
 </body>
