@@ -1,96 +1,261 @@
+
 <!doctype html>
 <html lang="pt-BR">
-<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script><head>
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#07111f">
 <title>MARKET BRAIN AI</title>
+
+<script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
+
 <style>
-:root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--red:#ff8585;--amber:#ffc66d}
+:root{
+ color-scheme:dark;
+ --bg:#07111f;
+ --panel:#101e31;
+ --line:#23364f;
+ --muted:#91a4bb;
+ --blue:#55b8ff;
+ --green:#35d39a;
+ --red:#ff8585;
+ --amber:#ffc66d;
+}
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(160deg,#07111f,#0b1728);color:#eef5ff;font:15px system-ui,sans-serif}
-main{max-width:760px;margin:auto;padding:20px 16px 40px}
-<div id="chart" style="width:100%; height:350px;"></div>
- .top,.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-weight:850;letter-spacing:1.4px;font-size:19px}
-.tag,.pill{font-size:11px;border-radius:99px;padding:5px 9px;background:#27364b;color:#c8d7e8}
+body{
+ margin:0;
+ background:linear-gradient(160deg,#07111f,#0b1728);
+ color:#eef5ff;
+ font:15px system-ui,sans-serif;
+}
+main{max-width:900px;margin:auto;padding:18px 14px 40px}
+.top,.row{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:12px;
+}
+.brand{font-weight:850;letter-spacing:1.3px;font-size:19px}
+.tag,.pill{
+ font-size:11px;
+ border-radius:99px;
+ padding:6px 10px;
+ background:#27364b;
+ color:#c8d7e8;
+}
 .tag{border:1px solid #8a6730;color:var(--amber)}
-h1{font-size:27px;margin:24px 0 7px}
+h1{font-size:26px;margin:24px 0 7px}
 .sub,.muted{color:var(--muted)}
 .sub{margin:0 0 18px}
 .muted{font-size:12px}
-.card{background:rgba(16,30,49,.94);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0}
+.card{
+ background:rgba(16,30,49,.96);
+ border:1px solid var(--line);
+ border-radius:17px;
+ padding:15px;
+ margin:12px 0;
+}
 .section{font-weight:750;margin-bottom:12px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.metric{background:#0b192b;border:1px solid var(--line);border-radius:13px;padding:13px;min-width:0}
-.metric b{display:block;font-size:17px;margin-top:5px;overflow-wrap:anywhere}
-button,select{border:1px solid var(--line);border-radius:12px;padding:13px;background:#14263c;color:white;font-weight:700;font-size:14px}
-button{background:#168bd2;border:0;width:100%;margin-top:12px}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:10px;
+}
+.metric{
+ background:#0b192b;
+ border:1px solid var(--line);
+ border-radius:13px;
+ padding:12px;
+ min-width:0;
+}
+.metric b{
+ display:block;
+ font-size:16px;
+ margin-top:5px;
+ overflow-wrap:anywhere;
+}
+button,select{
+ border:1px solid var(--line);
+ border-radius:11px;
+ padding:12px;
+ background:#14263c;
+ color:white;
+ font-weight:700;
+ font-size:14px;
+}
+button{
+ background:#168bd2;
+ border:0;
+ width:100%;
+ margin-top:12px;
+}
 button:disabled{opacity:.5}
-select{width:100%;margin-top:8px}
+select{width:100%;margin-top:7px}
 .notice{font-size:12px;color:#b8c8da;line-height:1.5}
-.asset{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.good{color:var(--green)}
+.bad{color:var(--red)}
+.neutral{color:var(--amber)}
+#chart{
+ width:100%;
+ height:350px;
+ margin-top:10px;
+}
+.chart-info{
+ display:flex;
+ justify-content:space-between;
+ gap:8px;
+ flex-wrap:wrap;
+ font-size:11px;
+ color:var(--muted);
+ margin-top:8px;
+}
+.asset{
+ padding:10px 0;
+ border-bottom:1px solid var(--line);
+ font-size:12px;
+ line-height:1.6;
+}
 .asset:last-child{border:0}
-footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
-.good{color:var(--green)}.bad{color:var(--red)}.neutral{color:var(--amber)}
+footer{
+ color:#758ba4;
+ font-size:11px;
+ text-align:center;
+ margin-top:22px;
+ line-height:1.8;
+}
+@media(max-width:420px){
+ main{padding:14px 10px 30px}
+ h1{font-size:23px}
+ #chart{height:290px}
+ .metric b{font-size:14px}
+}
 </style>
 </head>
+
 <body>
-<div id="chart" style="width:100%; height:350px;"></div>
- <main>
+<main>
+
 <div class="top">
  <div class="brand">◈ MARKET BRAIN AI</div>
- <span class="tag">BINANCE SPOT</span>
+ <span class="tag">INTELIGÊNCIA DE MERCADO</span>
 </div>
 
 <h1>Central de inteligência</h1>
-<p class="sub">Análise técnica experimental · Binance Spot · sem ordens automáticas</p>
+<p class="sub">Análise técnica experimental · Binance Spot</p>
 
 <div class="card">
  <div class="row">
-  <b>Conexão com a Binance</b>
+  <b>Conexão com o mercado</b>
   <span class="pill" id="status">Aguardando</span>
  </div>
- <p class="notice" id="message">Toque em consultar para buscar dados públicos.</p>
+ <p class="notice" id="message">
+ Toque em consultar para buscar dados públicos da Binance.
+ </p>
  <button id="refresh" onclick="loadMarket()">Consultar mercado</button>
  <p class="muted" id="updated">Nenhuma consulta realizada.</p>
 </div>
 
 <div class="card">
- <div class="section">Ativo em análise</div>
+ <div class="section">Configuração da análise</div>
  <div class="grid">
-  <div class="metric"><span class="muted">Par</span><b>ETH/USDT</b></div>
-  <div class="metric"><span class="muted">Último preço</span><b id="price">--</b></div>
   <div class="metric">
-   <span class="muted">Período das velas</span>
-   <select id="interval" onchange="loadMarket()">
-    <option value="1m">1 minuto</option>
-    <option value="5m" selected>5 minutos</option>
+   <span class="muted">Ativo</span>
+   <select id="symbol">
+    <option value="BTCUSDT">BTC / USDT</option>
+    <option value="ETHUSDT" selected>ETH / USDT</option>
+    <option value="BNBUSDT">BNB / USDT</option>
+    <option value="SOLUSDT">SOL / USDT</option>
+    <option value="XRPUSDT">XRP / USDT</option>
+    <option value="ADAUSDT">ADA / USDT</option>
+    <option value="DOGEUSDT">DOGE / USDT</option>
+    <option value="LINKUSDT">LINK / USDT</option>
    </select>
   </div>
-  <div class="metric"><span class="muted">Variação da última vela fechada</span><b id="change">--</b></div>
+  <div class="metric">
+   <span class="muted">Período gráfico</span>
+   <select id="interval">
+    <option value="1m">1 minuto</option>
+    <option value="5m" selected>5 minutos</option>
+    <option value="15m">15 minutos</option>
+    <option value="30m">30 minutos</option>
+    <option value="1h">1 hora</option>
+    <option value="4h">4 horas</option>
+    <option value="1d">1 dia</option>
+    <option value="1w">1 semana</option>
+   </select>
+  </div>
+ </div>
+ <button id="apply" onclick="loadMarket()">Aplicar configuração</button>
+</div>
+
+<div class="card">
+ <div class="section">Gráfico profissional</div>
+ <div class="row">
+  <b id="chartTitle">ETH / USDT</b>
+  <span class="pill">Velas japonesas</span>
+ </div>
+ <div id="chart"></div>
+ <div class="chart-info">
+  <span>Verde: alta</span>
+  <span>Vermelho: baixa</span>
+  <span>Dados públicos da Binance</span>
+ </div>
+</div>
+
+<div class="card">
+ <div class="section">Preço e desempenho</div>
+ <div class="grid">
+  <div class="metric">
+   <span class="muted">Último preço</span>
+   <b id="price">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">Variação da vela</span>
+   <b id="change">--</b>
+  </div>
  </div>
 </div>
 
 <div class="card">
  <div class="section">Indicadores técnicos</div>
  <div class="grid">
-  <div class="metric"><span class="muted">EMA 9</span><b id="ema9">--</b></div>
-  <div class="metric"><span class="muted">EMA 21</span><b id="ema21">--</b></div>
-  <div class="metric"><span class="muted">RSI 14</span><b id="rsi">--</b></div>
-  <div class="metric"><span class="muted">MACD</span><b id="macd">--</b></div>
-  <div class="metric"><span class="muted">Sinal MACD</span><b id="macdSignal">--</b></div>
-  <div class="metric"><span class="muted">Volume relativo</span><b id="volume">--</b></div>
+  <div class="metric">
+   <span class="muted">EMA 9</span>
+   <b id="ema9">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">EMA 21</span>
+   <b id="ema21">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">RSI 14</span>
+   <b id="rsi">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">MACD</span>
+   <b id="macd">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">Sinal MACD</span>
+   <b id="macdSignal">--</b>
+  </div>
+  <div class="metric">
+   <span class="muted">Volume relativo</span>
+   <b id="volume">--</b>
+  </div>
  </div>
 </div>
 
 <div class="card">
- <div class="section">Leitura do mercado</div>
+ <div class="section">Inteligência do mercado</div>
  <div class="row">
   <b id="bias">Aguardando análise</b>
   <span class="pill">Experimental</span>
  </div>
- <p class="notice" id="analysis">Os indicadores serão calculados após a consulta.</p>
+ <p class="notice" id="analysis">
+ Aguardando dados suficientes para análise.
+ </p>
+ <p class="muted" id="score">Pontuação: --</p>
 </div>
 
 <div class="card">
@@ -99,174 +264,399 @@ footer{color:#758ba4;font-size:11px;text-align:center;margin-top:22px}
 </div>
 
 <div class="card">
- <div class="section">Estado do scanner</div>
+ <div class="section">Scanner de oportunidades</div>
  <b id="scanner">Aguardando dados</b>
- <p class="notice">Esta versão calcula indicadores técnicos básicos a partir de dados públicos. A leitura é experimental, não é uma previsão nem uma recomendação financeira. Nenhuma compra ou venda é realizada.</p>
+ <p class="notice">
+ O scanner identifica alinhamentos técnicos. Só considera uma leitura
+ forte quando os indicadores concordam. Não é uma previsão nem uma
+ recomendação de compra ou venda.
+ </p>
+</div>
+
+<div class="card">
+ <div class="section">Segurança operacional</div>
+ <p class="notice">
+ Esta versão utiliza somente dados públicos. Não possui acesso à conta,
+ não envia ordens e não movimenta dinheiro. O modo automático ainda
+ não está habilitado.
+ </p>
 </div>
 
 <footer>
-MARKET BRAIN AI · versão 0.3.0<br>
-Binance Spot · análise experimental · sem ordens automáticas
+ MARKET BRAIN AI · versão 0.4.0<br>
+ Binance Spot · análise experimental · sem ordens automáticas
 </footer>
+
 </main>
 
 <script>
+"use strict";
+
 const API="https://data-api.binance.vision";
-const money=new Intl.NumberFormat("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:4});
 
-function el(id){return document.getElementById(id)}
-function fmt(value){return money.format(value)}
+const money=new Intl.NumberFormat("pt-BR",{
+ minimumFractionDigits:2,
+ maximumFractionDigits:6
+});
 
-async function getJSON(path){
- const response=await fetch(API+path);
- if(!response.ok)throw new Error("Resposta HTTP "+response.status);
- return response.json();
+let chart=null;
+let candleSeries=null;
+let volumeSeries=null;
+
+function el(id){
+ return document.getElementById(id);
 }
 
-function ema(values,period){
- if(values.length<period)return null;
- const k=2/(period+1);
- let result=values[0];
- for(let i=1;i<values.length;i++)result=values[i]*k+result*(1-k);
- return result;
-}
-
-function rsi(values,period=14){
- if(values.length<=period)return null;
- let gains=0,losses=0;
- for(let i=values.length-period;i<values.length;i++){
-  const change=values[i]-values[i-1];
-  if(change>0)gains+=change;
-  else losses-=change;
- }
- const avgGain=gains/period;
- const avgLoss=losses/period;
- if(avgLoss===0)return 100;
- return 100-(100/(1+avgGain/avgLoss));
-}
-
-function macdData(values){
- if(values.length<35)return null;
- const fast=[],slow=[];
- for(let i=0;i<values.length;i++){
-  fast.push(ema(values.slice(0,i+1),12));
-  slow.push(ema(values.slice(0,i+1),26));
- }
- const line=[];
- for(let i=0;i<values.length;i++){
-  if(fast[i]!==null&&slow[i]!==null)line.push(fast[i]-slow[i]);
- }
- if(line.length<9)return null;
- return {value:line[line.length-1],signal:ema(line,9)};
+function fmt(value){
+ return money.format(value);
 }
 
 function setValue(id,value){
  el(id).textContent=value;
 }
 
+function setStatus(message,kind="neutral"){
+ setValue("status",message);
+ el("status").className="pill "+kind;
+}
+
+async function getJSON(path){
+ const response=await fetch(API+path);
+
+ if(!response.ok){
+  throw new Error("Resposta HTTP "+response.status);
+ }
+
+ return response.json();
+}
+
+function initChart(){
+ const container=el("chart");
+
+ if(!window.LightweightCharts){
+  throw new Error("Biblioteca de gráficos não carregada.");
+ }
+
+ chart=LightweightCharts.createChart(container,{
+  width:container.clientWidth,
+  height:container.clientHeight,
+  layout:{
+   background:{color:"#101e31"},
+   textColor:"#b8c8da"
+  },
+  grid:{
+   vertLines:{color:"#1c3047"},
+   horzLines:{color:"#1c3047"}
+  },
+  rightPriceScale:{
+   borderColor:"#344b65"
+  },
+  timeScale:{
+   borderColor:"#344b65",
+   timeVisible:true,
+   secondsVisible:false
+  },
+  crosshair:{
+   mode:LightweightCharts.CrosshairMode.Normal
+  }
+ });
+
+ candleSeries=chart.addCandlestickSeries({
+  upColor:"#35d39a",
+  downColor:"#ff8585",
+  borderUpColor:"#35d39a",
+  borderDownColor:"#ff8585",
+  wickUpColor:"#35d39a",
+  wickDownColor:"#ff8585"
+ });
+
+ volumeSeries=chart.addHistogramSeries({
+  priceFormat:{type:"volume"},
+  priceScaleId:"",
+  scaleMargins:{
+   top:0.82,
+   bottom:0
+  }
+ });
+
+ chart.timeScale().fitContent();
+
+ window.addEventListener("resize",()=>{
+  if(chart){
+   chart.applyOptions({
+    width:container.clientWidth
+   });
+  }
+ });
+}
+
+function ema(values,period){
+ if(values.length<period)return null;
+
+ const result=[];
+ let average=0;
+
+ for(let i=0;i<period;i++){
+  average+=values[i];
+ }
+
+ let previous=average/period;
+ result[period-1]=previous;
+
+ const multiplier=2/(period+1);
+
+ for(let i=period;i<values.length;i++){
+  previous=(values[i]-previous)*multiplier+previous;
+  result[i]=previous;
+ }
+
+ return result;
+}
+
+function rsi(values,period=14){
+ if(values.length<=period)return null;
+
+ let gains=0;
+ let losses=0;
+
+ for(let i=1;i<=period;i++){
+  const change=values[i]-values[i-1];
+
+  if(change>0)gains+=change;
+  else losses-=change;
+ }
+
+ let avgGain=gains/period;
+ let avgLoss=losses/period;
+
+ for(let i=period+1;i<values.length;i++){
+  const change=values[i]-values[i-1];
+
+  avgGain=(avgGain*(period-1)+Math.max(change,0))/period;
+  avgLoss=(avgLoss*(period-1)+Math.max(-change,0))/period;
+ }
+
+ if(avgLoss===0)return 100;
+
+ return 100-(100/(1+avgGain/avgLoss));
+}
+
+function macdData(values){
+ const fast=ema(values,12);
+ const slow=ema(values,26);
+
+ if(!fast||!slow)return null;
+
+ const line=[];
+
+ for(let i=0;i<values.length;i++){
+  if(fast[i]!==undefined&&slow[i]!==undefined){
+   line.push(fast[i]-slow[i]);
+  }
+ }
+
+ if(line.length<9)return null;
+
+ const signal=ema(line,9);
+
+ if(!signal)return null;
+
+ return{
+  value:line[line.length-1],
+  signal:signal[signal.length-1]
+ };
+}
+
+function drawChart(candles){
+ if(!chart||!candleSeries||!volumeSeries){
+  initChart();
+ }
+
+ const chartCandles=candles.map(c=>({
+  time:Math.floor(Number(c[0])/1000),
+  open:Number(c[1]),
+  high:Number(c[2]),
+  low:Number(c[3]),
+  close:Number(c[4])
+ }));
+
+ const chartVolumes=candles.map(c=>({
+  time:Math.floor(Number(c[0])/1000),
+  value:Number(c[5]),
+  color:Number(c[4])>=Number(c[1])
+   ?"rgba(53,211,154,.45)"
+   :"rgba(255,133,133,.45)"
+ }));
+
+ candleSeries.setData(chartCandles);
+ volumeSeries.setData(chartVolumes);
+ chart.timeScale().fitContent();
+}
+
+function updateAnalysis(closes,volumes,last){
+ const e9=ema(closes,9);
+ const e21=ema(closes,21);
+ const r=rsi(closes,14);
+ const m=macdData(closes);
+
+ if(!e9||!e21||r===null||!m){
+  throw new Error("Dados insuficientes para calcular indicadores.");
+ }
+
+ const ema9Value=e9[e9.length-1];
+ const ema21Value=e21[e21.length-1];
+
+ const previousVolumes=volumes.slice(-21,-1);
+ const averageVolume=previousVolumes.reduce((a,b)=>a+b,0)/
+  Math.max(previousVolumes.length,1);
+
+ const relativeVolume=averageVolume>0
+  ?volumes[volumes.length-1]/averageVolume:0;
+
+ setValue("ema9","US$ "+fmt(ema9Value));
+ setValue("ema21","US$ "+fmt(ema21Value));
+ setValue("rsi",r.toFixed(2));
+ setValue("macd",m.value.toFixed(6));
+ setValue("macdSignal",m.signal.toFixed(6));
+ setValue("volume",relativeVolume.toFixed(2)+"x da média");
+
+ const bullishTrend=ema9Value>ema21Value;
+ const bullishMomentum=r>50;
+ const bullishMacd=m.value>m.signal;
+
+ let score=0;
+ score+=bullishTrend?1:-1;
+ score+=bullishMomentum?1:-1;
+ score+=bullishMacd?1:-1;
+
+ let title="Neutro — aguardar";
+ let explanation="Os indicadores não apresentam alinhamento suficiente.";
+ let css="neutral";
+ let scanner="Nenhuma oportunidade de alta qualidade identificada.";
+
+ if(score===3){
+  title="Viés comprador";
+  explanation="EMA 9 acima da EMA 21, RSI acima de 50 e MACD acima da linha de sinal. Há alinhamento técnico positivo, mas não garantia de alta.";
+  css="good";
+  scanner="Alinhamento comprador identificado. Aguardar confirmação adicional.";
+ }else if(score===-3){
+  title="Viés vendedor";
+  explanation="EMA 9 abaixo da EMA 21, RSI abaixo de 50 e MACD abaixo da linha de sinal. Há alinhamento técnico negativo, mas não garantia de queda.";
+  css="bad";
+  scanner="Alinhamento vendedor identificado. Aguardar confirmação adicional.";
+ }
+
+ setValue("bias",title);
+ el("bias").className=css;
+ setValue("analysis",explanation+
+  " Volume relativo: "+relativeVolume.toFixed(2)+" vezes a média.");
+
+ setValue("score","Pontuação técnica: "+score+" de 3");
+ setValue("scanner",scanner);
+
+ return relativeVolume;
+}
+
+function showCandles(candles){
+ el("candles").innerHTML="";
+
+ candles.slice(-5).reverse().forEach(c=>{
+  const item=document.createElement("div");
+  item.className="asset";
+
+  const open=Number(c[1]);
+  const close=Number(c[4]);
+  const direction=close>=open?"Alta":"Baixa";
+
+  item.textContent=
+   new Date(Number(c[0])).toLocaleString("pt-BR")+
+   " · "+direction+
+   " · Abertura: "+fmt(open)+
+   " · Fechamento: "+fmt(close)+
+   " · Máx: "+fmt(Number(c[2]))+
+   " · Mín: "+fmt(Number(c[3]));
+
+  el("candles").appendChild(item);
+ });
+}
+
 async function loadMarket(){
  const button=el("refresh");
+ const apply=el("apply");
+
  button.disabled=true;
- el("status").textContent="Consultando";
- el("message").textContent="Buscando dados públicos da Binance...";
- el("scanner").textContent="Recebendo dados";
+ apply.disabled=true;
+
+ setStatus("Consultando");
+ setValue("message","Buscando dados públicos da Binance...");
+ setValue("scanner","Recebendo dados...");
 
  try{
+  const symbol=el("symbol").value;
   const interval=el("interval").value;
+
   const [ticker,raw]=await Promise.all([
-   getJSON("/api/v3/ticker/price?symbol=ETHUSDT"),
-   getJSON("/api/v3/klines?symbol=ETHUSDT&interval="+interval+"&limit=100")
+   getJSON("/api/v3/ticker/price?symbol="+symbol),
+   getJSON("/api/v3/klines?symbol="+symbol+
+    "&interval="+interval+"&limit=200")
   ]);
 
   const now=Date.now();
   const closed=raw.filter(c=>Number(c[6])<now);
-  if(closed.length<35)throw new Error("Dados insuficientes para os indicadores.");
+
+  if(closed.length<35){
+   throw new Error("Dados insuficientes para os indicadores.");
+  }
 
   const closes=closed.map(c=>Number(c[4]));
   const volumes=closed.map(c=>Number(c[5]));
+
   const last=closed[closed.length-1];
   const open=Number(last[1]);
   const close=Number(last[4]);
   const variation=((close-open)/open)*100;
 
-  const e9=ema(closes.slice(-9),9);
-  const e21=ema(closes.slice(-21),21);
-  const r=rsi(closes,14);
-  const m=macdData(closes);
-
-  const previousVolumes=volumes.slice(-21,-1);
-  const averageVolume=previousVolumes.reduce((a,b)=>a+b,0)/previousVolumes.length;
-  const relativeVolume=averageVolume>0?volumes[volumes.length-1]/averageVolume:0;
-
   setValue("price","US$ "+fmt(Number(ticker.price)));
-  setValue("change",(variation>=0?"+":"")+variation.toFixed(3)+"%");
+  setValue("change",(variation>=0?"+":"")+
+   variation.toFixed(3)+"%");
+
   el("change").className=variation>=0?"good":"bad";
-  setValue("ema9","US$ "+fmt(e9));
-  setValue("ema21","US$ "+fmt(e21));
-  setValue("rsi",r.toFixed(2));
-  setValue("macd",m?m.value.toFixed(4):"--");
-  setValue("macdSignal",m?m.signal.toFixed(4):"--");
-  setValue("volume",relativeVolume.toFixed(2)+"x da média");
 
-  const trend=e9>e21;
-  const momentum=r>50;
-  const macdPositive=m&&m.value>m.signal;
-  let score=0;
-  if(trend)score++;
-  else score--;
-  if(momentum)score++;
-  else score--;
-  if(macdPositive)score++;
-  else score--;
+  setValue("chartTitle",symbol.replace("USDT"," / USDT"));
 
-  let title="Neutro — aguardar";
-  let explanation="Os indicadores estão mistos. Não há alinhamento suficiente.";
-  let css="neutral";
+  drawChart(closed);
 
-  if(score===3){
-   title="Viés comprador";
-   explanation="EMA 9 acima da EMA 21, RSI acima de 50 e MACD acima da linha de sinal. Isso não garante continuidade da alta.";
-   css="good";
-  }else if(score===-3){
-   title="Viés vendedor";
-   explanation="EMA 9 abaixo da EMA 21, RSI abaixo de 50 e MACD abaixo da linha de sinal. Isso não garante continuidade da queda.";
-   css="bad";
-  }
+  updateAnalysis(closes,volumes,last);
+  showCandles(closed);
 
-  setValue("bias",title);
-  el("bias").className=css;
-  setValue("analysis",explanation+" Volume relativo: "+relativeVolume.toFixed(2)+" vezes a média das 20 velas anteriores.");
-  el("candles").innerHTML="";
+  setStatus("Dados recebidos","good");
 
-  closed.slice(-5).reverse().forEach(c=>{
-   const item=document.createElement("div");
-   item.className="asset";
-   const direction=Number(c[4])>=Number(c[1])?"Alta":"Baixa";
-   item.textContent=new Date(Number(c[0])).toLocaleString("pt-BR")+
-    " · "+direction+
-    " · Abertura: "+fmt(Number(c[1]))+
-    " · Fechamento: "+fmt(Number(c[4]))+
-    " · Máx: "+fmt(Number(c[2]))+
-    " · Mín: "+fmt(Number(c[3]))+
-    " · Volume: "+Number(c[5]).toFixed(3);
-   el("candles").appendChild(item);
-  });
+  setValue("message",
+   "Consulta concluída. Indicadores calculados com velas fechadas.");
 
-  el("status").textContent="Dados recebidos";
-  el("status").className="pill good";
-  el("message").textContent="Consulta concluída. Indicadores calculados com candles fechados.";
-  el("scanner").textContent="Análise técnica disponível";
-  el("updated").textContent="Atualizado em "+new Date().toLocaleString("pt-BR");
+  setValue("updated",
+   "Atualizado em "+new Date().toLocaleString("pt-BR"));
 
  }catch(error){
-  el("status").textContent="Falha na consulta";
-  el("status").className="pill bad";
-  el("message").textContent="Não foi possível concluir a análise: "+error.message;
-  el("scanner").textContent="Sem análise";
+  setStatus("Falha na consulta","bad");
+  setValue("message","Não foi possível concluir: "+error.message);
+  setValue("scanner","Sem análise disponível");
+  setValue("analysis","Aguardando uma consulta bem-sucedida.");
  }finally{
   button.disabled=false;
+  apply.disabled=false;
  }
 }
+
+try{
+ initChart();
+}catch(error){
+ setValue("message",
+  "O gráfico será inicializado quando a biblioteca estiver disponível.");
+}
+
+setValue("chartTitle","ETH / USDT");
 </script>
+
 </body>
 </html>
