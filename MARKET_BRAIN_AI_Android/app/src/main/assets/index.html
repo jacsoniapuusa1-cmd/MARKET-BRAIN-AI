@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#07111f">
-<title>MARKET BRAIN AI 0.5.0</title>
+<title>MARKET BRAIN AI 0.6.0</title>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--red:#ff8585;--amber:#ffc66d}
@@ -48,7 +48,7 @@ footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-heigh
 <main>
 <div class="top">
  <div class="brand">◈ MARKET BRAIN AI</div>
- <span class="tag">MOTOR 0.5.0</span>
+ <span class="tag">MOTOR 0.6.0</span>
 </div>
 <h1>Central de inteligência</h1>
 <p class="sub">Scanner seletivo · Binance Spot · Análise experimental</p>
@@ -143,7 +143,7 @@ footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-heigh
  <p class="notice">Esta versão usa somente dados públicos. Não acessa contas, não envia ordens e não movimenta dinheiro. A integração com Stelar Broker e qualquer modo automático ainda não estão habilitados.</p>
 </div>
 
-<footer>MARKET BRAIN AI · 0.5.0<br>Motor experimental · Sem execução automática</footer>
+<footer>MARKET BRAIN AI · 0.6.0<br>Motor experimental · Sem execução automática</footer>
 </main>
 
 <script>
@@ -383,8 +383,8 @@ function stopScanner(){
  $("scannerState").textContent="Monitoramento pausado.";
  showWait("Monitoramento interrompido pelo usuário.");
 }
-$("symbol").addEventListener("change",()=>{if(running)loadChart()});
-$("interval").addEventListener("change",()=>{if(running)loadChart()});
+$("symbol").addEventListener("change",loadChart);
+$("interval").addEventListener("change",loadChart);
 try{initChart()}catch(e){$("message").textContent="O gráfico será carregado quando a biblioteca estiver disponível."}
 </script>
 </body>

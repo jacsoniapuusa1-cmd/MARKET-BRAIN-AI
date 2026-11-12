@@ -1,4 +1,4 @@
-# MARKET BRAIN AI — Android (base 0.1.0)
+# MARKET BRAIN AI — Android (base 0.6.0)
 
 Este é o projeto-fonte inicial de um aplicativo Android nativo com painel local em WebView.
 
