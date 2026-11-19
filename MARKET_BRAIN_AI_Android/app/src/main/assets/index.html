@@ -4,8 +4,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#07111f">
-<title>MARKET BRAIN AI 0.6.0</title>
+<meta name="theme-color" content="#123d70">
+<title>MARKET BRAIN AI 1.0.2-dev</title>
 <script src="https://unpkg.com/lightweight-charts@4.2.2/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#07111f;--panel:#101e31;--line:#23364f;--muted:#91a4bb;--blue:#55b8ff;--green:#35d39a;--red:#ff8585;--amber:#ffc66d}
@@ -14,6 +14,10 @@ body{margin:0;background:linear-gradient(160deg,#07111f,#0b1728);color:#eef5ff;f
 main{max-width:950px;margin:auto;padding:16px 12px 40px}
 .top,.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .brand{font-size:19px;font-weight:850;letter-spacing:1px}
+.brand-block{display:flex;flex-direction:column;gap:4px}
+.brand-kicker{font-size:12px;font-weight:850;letter-spacing:2px;color:#d9e8f8}
+.brand-slogan{font-size:12px;font-weight:650;color:var(--blue)}
+.brand-motto{font-size:9px;letter-spacing:1.5px;color:var(--muted)}
 .tag,.pill{font-size:11px;border-radius:99px;padding:6px 10px;background:#27364b;color:#c8d7e8}
 .tag{border:1px solid #8a6730;color:var(--amber)}
 h1{font-size:25px;margin:22px 0 5px}
@@ -31,7 +35,20 @@ button,select{border:1px solid var(--line);border-radius:10px;padding:11px;backg
 button{background:#168bd2;border:0;width:100%;margin-top:10px}
 button:disabled{opacity:.5}
 select{width:100%;margin-top:6px}
+input{width:100%;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:11px;background:#14263c;color:white;font-size:14px}
+.risk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.risk-field{min-width:0}
+.risk-result{background:#0b192b;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px}
 #chart{height:310px;width:100%;margin-top:10px}
+.clock-panel{background:#0b192b;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:12px;text-align:center}
+.clock-caption{font-size:10px;letter-spacing:1.4px;color:var(--muted)}
+#brasiliaClock{display:block;font-size:29px;font-weight:850;font-variant-numeric:tabular-nums;margin-top:3px}
+#brasiliaDate{font-size:11px;color:var(--muted)}
+#entryCountdown[hidden]{display:none}
+.countdown-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);text-align:left}
+.countdown-name{font-size:12px;font-weight:750}
+.countdown-status{font-size:10px;color:var(--muted);margin-top:3px}
+.countdown-time{font-size:18px;font-variant-numeric:tabular-nums}
 .asset{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.6}
 .asset:last-child{border:0}
 .signal{border-left:4px solid var(--amber);padding:10px;background:#0b192b;border-radius:8px;margin:9px 0}
@@ -41,17 +58,258 @@ table{width:100%;border-collapse:collapse;font-size:12px}
 td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}
 th{color:var(--muted)}
 footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-height:1.8}
+/* MARKET BRAIN AI — CYBER PREMIUM */
+:root{
+ --bg:#050b16;
+ --panel:#0d1a2d;
+ --line:#1d3b5c;
+ --muted:#9bb2cc;
+ --blue:#35baff;
+ --green:#36e0a0;
+ --red:#ff647c;
+ --amber:#f4c66a;
+ --cyan:#55e7ff;
+}
+body{
+ background:
+  radial-gradient(ellipse at 50% -15%,rgba(27,116,190,.22),transparent 48%),
+  linear-gradient(160deg,#050b16 0%,#091426 55%,#07101e 100%);
+ color:#f1f7ff;
+}
+main{padding-top:18px}
+.top{
+ padding:13px;
+ border:1px solid rgba(85,231,255,.18);
+ border-radius:16px;
+ background:linear-gradient(120deg,rgba(14,35,59,.96),rgba(8,19,35,.96));
+ box-shadow:0 8px 28px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.04);
+}
+.brand{color:#f4f8ff;text-shadow:0 0 16px rgba(53,186,255,.22)}
+.brand-kicker{color:var(--amber)}
+.brand-slogan{color:var(--cyan)}
+.brand-motto{color:#9bb2cc}
+.tag,.pill{
+ background:rgba(30,55,82,.75);
+ border-color:rgba(244,198,106,.42);
+}
+.card{
+ background:linear-gradient(145deg,rgba(15,32,53,.98),rgba(9,22,39,.98));
+ border:1px solid rgba(72,139,190,.23);
+ border-radius:17px;
+ box-shadow:0 10px 28px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.025);
+}
+.section{color:#eaf6ff;letter-spacing:.2px}
+.metric,.risk-result,.clock-panel{
+ background:linear-gradient(145deg,#10243b,#0a192c);
+ border-color:rgba(75,163,218,.25);
+ box-shadow:inset 0 1px rgba(255,255,255,.035);
+}
+.metric b{color:#f4f8ff}
+.metric b.good{color:var(--green)}
+.metric b.bad{color:var(--red)}
+button,select,input{
+ background:#10243b;
+ border:1px solid #285071;
+ color:#f2f8ff;
+ border-radius:11px;
+}
+button{
+ background:linear-gradient(110deg,#087fc5,#16b8e5);
+ color:#fff;
+ border:1px solid rgba(115,226,255,.35);
+ box-shadow:0 4px 16px rgba(0,151,220,.18);
+}
+button:active{transform:translateY(1px)}
+button:disabled{box-shadow:none}
+input:focus,select:focus{
+ outline:2px solid rgba(85,231,255,.28);
+ border-color:var(--cyan);
+}
+.signal{
+ background:linear-gradient(110deg,rgba(17,39,61,.98),rgba(10,25,43,.98));
+ border:1px solid rgba(85,139,181,.16);
+ border-left:4px solid var(--amber);
+}
+.signal.buy{border-left-color:var(--green)}
+.signal.sell{border-left-color:var(--red)}
+.signal.wait{border-left-color:var(--amber)}
+td,th{border-bottom-color:#203a55}
+th{color:#9fc0dc}
+.notice{color:#b9cce0}
+footer{color:#829bb5}
+#brasiliaClock{
+ color:var(--cyan);
+ text-shadow:0 0 18px rgba(85,231,255,.22);
+}
+#chart{
+ border-radius:12px;
+ overflow:hidden;
+}
 @media(max-width:420px){h1{font-size:22px}#chart{height:260px}.metric b{font-size:14px}}
+/* MARKET BRAIN AI — CYBER LUMINOSO V2 */
+:root{
+ --bg:#102b50;
+ --panel:#173e68;
+ --line:#347bb0;
+ --muted:#c1d9f2;
+ --blue:#55caff;
+ --cyan:#65f0ff;
+ --green:#42f0ae;
+ --red:#ff647f;
+ --amber:#ffd36e;
+}
+body{
+ background:
+  radial-gradient(ellipse at 50% 0%,rgba(45,174,255,.42),transparent 55%),
+  linear-gradient(145deg,#123d70 0%,#0b2445 52%,#102f55 100%);
+ color:#ffffff;
+}
+main{padding-top:18px}
+.top{
+ background:linear-gradient(115deg,#1c5487,#12375f);
+ border:1px solid #65dfff;
+ box-shadow:0 0 22px rgba(49,190,255,.22);
+}
+.brand{color:#ffffff;text-shadow:0 0 12px rgba(85,202,255,.4)}
+.brand-kicker{color:#ffda83}
+.brand-slogan{color:#72efff}
+.brand-motto{color:#c5e5ff}
+.tag,.pill{
+ background:#285783;
+ color:#ffffff;
+ border:1px solid #f4ca70;
+}
+h1{color:#ffffff;text-shadow:0 0 14px rgba(85,202,255,.22)}
+.sub,.muted{color:#c1d9f2}
+.card{
+ background:linear-gradient(145deg,#194875,#12365e);
+ border:1px solid #438cc0;
+ border-radius:17px;
+ box-shadow:0 7px 22px rgba(0,0,0,.22);
+}
+.section{color:#ffffff}
+.metric,.risk-result,.clock-panel{
+ background:linear-gradient(145deg,#205887,#17436e);
+ border:1px solid #55b9e9;
+ box-shadow:inset 0 1px rgba(255,255,255,.09);
+}
+.metric b{color:#ffffff}
+.metric b.good{color:#52f2b2}
+.metric b.bad{color:#ff8194}
+.notice{color:#d4e8fa}
+button,select,input{
+ background:#17436c;
+ border:1px solid #60bfe9;
+ color:#ffffff;
+}
+button{
+ background:linear-gradient(110deg,#087fd4,#13c5e8);
+ border:1px solid #8ceeff;
+ color:#ffffff;
+ box-shadow:0 0 15px rgba(24,190,245,.28);
+}
+button:disabled{opacity:.5}
+input:focus,select:focus{
+ outline:2px solid #65f0ff;
+ border-color:#65f0ff;
+}
+.signal{
+ background:linear-gradient(110deg,#20517b,#173c64);
+ border:1px solid #4385b5;
+ border-left:5px solid var(--amber);
+}
+.signal.buy{border-left-color:#42f0ae}
+.signal.sell{border-left-color:#ff647f}
+.signal.wait{border-left-color:#ffd36e}
+.clock-caption{color:#c1d9f2}
+#brasiliaClock{
+ color:#70efff;
+ text-shadow:0 0 15px rgba(101,240,255,.35);
+}
+#brasiliaDate{color:#c1d9f2}
+.countdown-status{color:#c1d9f2}
+.countdown-time{color:#ffffff}
+.asset{border-bottom-color:#39729e}
+td,th{border-bottom-color:#39729e;color:#eaf6ff}
+th{color:#a9d9f5}
+footer{color:#b0cce5}
+#chart{
+ background:#102f50;
+ border:1px solid #438cc0;
+ border-radius:13px;
+}
+@media(max-width:420px){
+ h1{font-size:22px}
+ #chart{height:260px}
+ .metric b{font-size:14px}
+}
+.collapse-arrow{
+width:38px;
+min-width:38px;
+margin:0;
+padding:5px;
+background:transparent;
+border:1px solid var(--cyan);
+color:var(--cyan);
+font-size:16px;
+line-height:1;
+box-shadow:none;
+}
+.collapse-arrow:active{transform:scale(.96)}
+.brand-line{display:flex;align-items:center;gap:10px;min-width:0}
+.brain-mark{width:46px;height:46px;flex:0 0 46px;filter:drop-shadow(0 0 7px #16cfff88)}
+.brand-line .brand{min-width:0}
+@media(max-width:420px){.brain-mark{width:40px;height:40px;flex-basis:40px}.brand-line{gap:7px}}
 </style>
 </head>
 <body>
 <main>
 <div class="top">
- <div class="brand">◈ MARKET BRAIN AI</div>
- <span class="tag">MOTOR 0.6.0</span>
+ <div class="brand-block">
+  <div class="brand-line">
+   <svg class="brain-mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cérebro robótico">
+    <defs>
+     <linearGradient id="brainGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#67f7ff"/>
+      <stop offset="1" stop-color="#2875ff"/>
+     </linearGradient>
+    </defs>
+    <path d="M31 12 C25 4 14 10 15 19 C5 20 7 34 14 37 C9 46 18 55 27 50 L31 46 Z" fill="#102d50" stroke="url(#brainGlow)" stroke-width="2.5"/>
+    <path d="M33 12 C39 4 50 10 49 19 C59 20 57 34 50 37 C55 46 46 55 37 50 L33 46 Z" fill="#102d50" stroke="url(#brainGlow)" stroke-width="2.5"/>
+    <path d="M31 12 L31 46 M33 12 L33 46" stroke="#8afaff" stroke-width="1.5"/>
+    <g fill="none" stroke="#62eaff" stroke-width="1.7" stroke-linecap="round">
+     <path d="M15 23 L23 23 L27 29 L23 34 L16 34"/>
+     <path d="M49 23 L41 23 L37 29 L41 34 L48 34"/>
+     <path d="M17 43 L25 43 L29 39"/>
+     <path d="M47 43 L39 43 L35 39"/>
+     <path d="M22 15 L25 20 M42 15 L39 20"/>
+    </g>
+    <g fill="#a4ffff">
+     <circle cx="15" cy="23" r="2"/><circle cx="49" cy="23" r="2"/>
+     <circle cx="16" cy="34" r="2"/><circle cx="48" cy="34" r="2"/>
+     <circle cx="17" cy="43" r="2"/><circle cx="47" cy="43" r="2"/>
+    </g>
+    <path d="M26 55 L38 55 L35 60 L29 60 Z" fill="#2875ff"/>
+   </svg>
+   <div class="brand">◈ MARKET BRAIN AI</div>
+  </div>
+  <div class="brand-kicker">O ROBÔ EXTRAORDINÁRIO</div>
+  <div class="brand-slogan">Analisa com inteligência, opera com sabedoria!</div>
+  <div class="brand-motto">DISCIPLINA · ESTRATÉGIA · INTELIGÊNCIA</div>
+ </div>
+ <span class="tag">MOTOR 1.0.2-dev</span>
 </div>
 <h1>Central de inteligência</h1>
-<p class="sub">Scanner seletivo · Binance Spot · Análise experimental</p>
+<p class="sub">Scanner de análise de mercado · Binance Spot / Stelar Broker</p>
+
+<div class="card">
+ <div class="section">Plataforma de operação</div>
+ <select id="platform" aria-label="Selecionar plataforma">
+  <option value="binance" selected>Binance Spot</option>
+  <option value="stelar">Stelar Broker</option>
+ </select>
+ <p class="muted">O robô analisará somente a plataforma selecionada.</p>
+</div>
 
 <div class="card">
  <div class="row">
@@ -97,7 +355,13 @@ footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-heigh
  <div class="section">Gráfico profissional</div>
  <b id="chartTitle">ETH / USDT</b>
  <div id="chart"></div>
- <p class="muted">Velas japonesas · Volume · Dados Binance</p>
+  <div class="clock-panel">
+    <div class="clock-caption">HORÁRIO DE BRASÍLIA</div>
+      <strong id="brasiliaClock">--:--:--</strong>
+        <div id="brasiliaDate">--/--/----</div>
+          <div id="entryCountdown" hidden></div>
+           </div>
+            <p class="muted">Velas japonesas · Volume · Dados Binance</p>
 </div>
 
 <div class="card">
@@ -116,21 +380,65 @@ footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-heigh
 </div>
 
 <div class="card">
+ <div style="background:#101e31;border:1px solid #23364f;border-radius:12px;padding:14px;margin:12px 0">
+  <div class="row" style="justify-content:space-between;align-items:center">
+   <div class="section">Configuração de entrada</div>
+   <button id="entryConfigToggle" class="collapse-arrow" type="button"
+    onclick="toggleEntryConfiguration()" aria-label="Recolher configuração de entrada"
+    aria-expanded="true">▼</button>
+  </div>
+  <div id="entryConfigContent">
+   <div class="muted">Horizonte automático de entrada</div>
+   <div class="metric"><b id="autoHorizon">Aguardando análise</b></div>
+   <div class="muted">Duração automática conforme o horizonte confirmado: 1 ou 5 minutos.</div>
+   <div class="risk-result">
+    <div class="section">Gerenciamento de risco · Binance Spot</div>
+    <p class="notice">Informe os valores que deseja utilizar nesta sessão. Nenhuma ordem será enviada.</p>
+    <div class="risk-grid">
+     <div class="risk-field">
+      <label for="riskBank">Banca disponível (USDT)</label>
+      <input id="riskBank" type="number" min="0" step="0.01" placeholder="Ex.: 500">
+     </div>
+     <div class="risk-field">
+      <label for="riskExposure">Exposição da banca (%)</label>
+      <input id="riskExposure" type="number" min="0" max="100" step="0.1" placeholder="Ex.: 2">
+     </div>
+     <div class="risk-field">
+      <label for="riskMaxLoss">Perda máxima (USDT)</label>
+      <input id="riskMaxLoss" type="number" min="0" step="0.01" placeholder="Defina seu limite">
+     </div>
+     <div class="risk-field">
+      <label for="riskAtrMultiplier">Multiplicador ATR</label>
+      <input id="riskAtrMultiplier" type="number" min="0.1" max="10" step="0.1" value="1.5">
+     </div>
+    </div>
+    <div id="riskResult" class="notice" style="margin-top:12px">
+     Aguardando configuração e análise. Os cálculos de risco ainda não estão ativados.
+    </div>
+   </div>
+   <div id="entrySchedule" style="margin-top:12px;color:#91a4bd">Aguardando oportunidade confirmada.</div>
+  </div>
+ </div>
  <div class="section">Central de antecipação</div>
  <div id="alertArea" class="signal wait">
   <b>AGUARDANDO OPORTUNIDADE</b>
   <p class="notice">Nenhuma entrada foi confirmada.</p>
  </div>
- <p class="notice">O pré-alerta indica um cenário em formação. Uma nova análise será realizada após cinco minutos. Não representa garantia de entrada nem horário previsto de execução.</p>
+ <p class="notice">O pré-alerta indica um cenário em formação. O horizonte de entrada é escolhido automaticamente: 1 ou 5 minutos. A entrada simulada só ocorre após nova validação. Não representa garantia de resultado.</p>
 </div>
 
 <div class="card">
- <div class="section">Scanner de oportunidades</div>
- <div id="scannerState" class="muted">Scanner desligado.</div>
- <table>
-  <thead><tr><th>Ativo</th><th>Direção</th><th>Pontos</th><th>Estado</th></tr></thead>
-  <tbody id="scannerRows"><tr><td colspan="4">Aguardando consulta.</td></tr></tbody>
- </table>
+ <div class="row" style="justify-content:space-between;align-items:center">
+  <div class="section">Scanner de oportunidades</div>
+  <button id="scannerToggle" type="button" onclick="toggleScanner()" aria-expanded="true">▼ Minimizar</button>
+ </div>
+ <div id="scannerContent">
+  <div id="scannerState" class="muted">Scanner desligado.</div>
+  <table>
+   <thead><tr><th>Ativo</th><th>Direção</th><th>Pontos</th><th>Estado</th></tr></thead>
+   <tbody id="scannerRows"><tr><td colspan="4">Aguardando consulta.</td></tr></tbody>
+  </table>
+ </div>
 </div>
 
 <div class="card">
@@ -139,11 +447,29 @@ footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-heigh
 </div>
 
 <div class="card">
+ <div style="background:#101e31;border:1px solid #23364f;border-radius:12px;padding:14px;margin:12px 0">
+  <div class="section">Resultados das simulações</div>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center">
+   <div><strong id="simWins">0</strong><div>WIN</div></div>
+   <div><strong id="simLosses">0</strong><div>LOSS</div></div>
+   <div><strong id="simDraws">0</strong><div>EMPATE</div></div>
+   <div><strong id="simTotal">0</strong><div>TOTAL</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px">
+   <div class="metric"><span class="muted">TAXA DE ACERTO</span><b id="simWinRate" class="good">—</b></div>
+   <div class="metric"><span class="muted">TAXA DE ERRO</span><b id="simLossRate" class="bad">—</b></div>
+  </div>
+  <div style="height:10px;background:#26364a;border-radius:99px;overflow:hidden;margin-top:10px">
+   <div id="simPerformanceBar" style="height:100%;width:0%;background:linear-gradient(90deg,#35d39a,#55dfff);border-radius:99px;transition:width .3s"></div>
+  </div>
+  <div id="simHistory" style="margin-top:12px;color:#91a4bd">Nenhuma simulação realizada.</div>
+  <p style="font-size:12px;color:#91a4bd">Resultados simulados com base na variação observada dos preços. Não são operações reais nem garantia de lucro.</p>
+ </div>
  <div class="section">Segurança operacional</div>
  <p class="notice">Esta versão usa somente dados públicos. Não acessa contas, não envia ordens e não movimenta dinheiro. A integração com Stelar Broker e qualquer modo automático ainda não estão habilitados.</p>
 </div>
 
-<footer>MARKET BRAIN AI · 0.6.0<br>Motor experimental · Sem execução automática</footer>
+<footer>MARKET BRAIN AI · 1.0.2-dev<br>Motor experimental · Sem execução automática</footer>
 </main>
 
 <script>
@@ -151,18 +477,57 @@ footer{text-align:center;color:#758ba4;font-size:11px;margin-top:22px;line-heigh
 
 const API="https://data-api.binance.vision";
 const SYMBOLS=["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","LINKUSDT"];
-const SCAN_INTERVALS=["5m","15m","1h"];
+const SCAN_INTERVALS=["1m","5m","15m","30m","1h","4h","1d","1w"];
 const $=id=>document.getElementById(id);
 const fmt=n=>Number(n).toLocaleString("pt-BR",{maximumFractionDigits:6});
 let chart=null,candleSeries=null,volumeSeries=null;
+let chartSocket=null,chartReconnectTimer=null,chartLoadId=0;
 let running=false,timer=null,scanBusy=false;
 let previousAlerts={};
 let historyItems=[];
+let simulationStats={WIN:0,LOSS:0,EMPATE:0};
+let pendingSimulations={};
+let brasiliaClockTimer=null;
+let countdownRefreshTimer=null;
+let latestCandidate=null;
 
 async function getJSON(path){
- const r=await fetch(API+path);
- if(!r.ok)throw new Error("Binance HTTP "+r.status);
- return r.json();
+ if(typeof path!=="string"||!path.startsWith("/")){
+  throw new Error("Caminho de consulta inválido.");
+ }
+ const controller=typeof AbortController!=="undefined"
+  ?new AbortController():null;
+ let timeoutId=null;
+ try{
+  const options=controller?{signal:controller.signal}:{};
+  if(controller){
+   timeoutId=setTimeout(()=>controller.abort(),12000);
+  }
+  const r=await fetch(API+path,options);
+  if(!r.ok){
+   throw new Error("Binance HTTP "+r.status);
+  }
+  let data;
+  try{
+   data=await r.json();
+  }catch{
+   throw new Error("Resposta JSON inválida da Binance.");
+  }
+  if(data===null||typeof data!=="object"){
+   throw new Error("Formato de resposta inválido da Binance.");
+  }
+  if(!Array.isArray(data)&&data.code!==undefined&&data.msg!==undefined){
+   throw new Error("Binance: "+data.msg);
+  }
+  return data;
+ }catch(error){
+  if(error&&error.name==="AbortError"){
+   throw new Error("Tempo limite: a Binance demorou para responder.");
+  }
+  throw error;
+ }finally{
+  if(timeoutId!==null)clearTimeout(timeoutId);
+ }
 }
 function setStatus(t){$("status").textContent=t}
 function ema(v,p){
@@ -177,11 +542,13 @@ function ema(v,p){
  return out;
 }
 function rsi(v,p=14){
- if(v.length<=p)return null;
+ if(!Array.isArray(v)||!Number.isInteger(p)||p<1||v.length<=p)return null;
+ if(!v.every(Number.isFinite))return null;
  let gain=0,loss=0;
  for(let i=1;i<=p;i++){
   const d=v[i]-v[i-1];
-  if(d>0)gain+=d;else loss-=d;
+  if(d>0)gain+=d;
+  else loss-=d;
  }
  let ag=gain/p,al=loss/p;
  for(let i=p+1;i<v.length;i++){
@@ -189,7 +556,10 @@ function rsi(v,p=14){
   ag=(ag*(p-1)+Math.max(d,0))/p;
   al=(al*(p-1)+Math.max(-d,0))/p;
  }
- return al===0?100:100-100/(1+ag/al);
+ if(ag===0&&al===0)return 50;
+ if(al===0)return 100;
+ if(ag===0)return 0;
+ return 100-100/(1+ag/al);
 }
 function macd(v){
  const a=ema(v,12),b=ema(v,26);
@@ -198,6 +568,28 @@ function macd(v){
  const sig=ema(line,9);
  if(!sig)return null;
  return {line:line.at(-1),signal:sig.at(-1)};
+}
+function calculateATR(candles,period=14){
+ if(!Array.isArray(candles)||!Number.isInteger(period)||period<1||
+  candles.length<=period)return null;
+ const ranges=[];
+ for(let i=1;i<candles.length;i++){
+  const high=Number(candles[i][2]);
+  const low=Number(candles[i][3]);
+  const previousClose=Number(candles[i-1][4]);
+  if(![high,low,previousClose].every(Number.isFinite))return null;
+  ranges.push(Math.max(
+   high-low,
+   Math.abs(high-previousClose),
+   Math.abs(low-previousClose)
+  ));
+ }
+ if(ranges.length<period)return null;
+ let value=ranges.slice(0,period).reduce((a,b)=>a+b,0)/period;
+ for(let i=period;i<ranges.length;i++){
+  value=((value*(period-1))+ranges[i])/period;
+ }
+ return Number.isFinite(value)?value:null;
 }
 function parseCandles(raw){
  const closed=raw.filter(c=>Number(c[6])<Date.now());
@@ -213,38 +605,92 @@ async function fetchFrame(symbol,interval){
  if(data.close.length<35)throw new Error("Histórico insuficiente");
  const e9=ema(data.close,9),e21=ema(data.close,21);
  const rr=rsi(data.close),mm=macd(data.close);
+ const atrValue=calculateATR(data.raw,14);
+ if(!Number.isFinite(rr)||!mm||!Number.isFinite(mm.line)||!Number.isFinite(mm.signal)||
+  !Number.isFinite(atrValue))
+  throw new Error("Indicadores insuficientes");
  const n=data.close.length;
  const avg=data.volume.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
  const rv=avg>0?data.volume.at(-1)/avg:0;
+ const direction=e9[n-1]>e21[n-1]&&rr>50&&mm.line>mm.signal?"BUY":
+  e9[n-1]<e21[n-1]&&rr<50&&mm.line<mm.signal?"SELL":"NEUTRAL";
  return {
-  direction:e9[n-1]>e21[n-1]&&rr>50&&mm.line>mm.signal?"BUY":
-   e9[n-1]<e21[n-1]&&rr<50&&mm.line<mm.signal?"SELL":"NEUTRAL",
+  interval,direction,
   rsi:rr,ema9:e9[n-1],ema21:e21[n-1],
-  macd:mm,relativeVolume:rv,price:data.close.at(-1),raw:data.raw
+  macd:mm,relativeVolume:rv,
+  atr:atrValue,atrPercent:atrValue/data.close.at(-1)*100,
+  price:data.close.at(-1),raw:data.raw
  };
 }
 async function analyzeSymbol(symbol){
  const frames=await Promise.all(SCAN_INTERVALS.map(i=>fetchFrame(symbol,i)));
- const weights=[1,2,3];
+ const weights=[1,2,2,2,3,3,4,4];
  let score=0;
  frames.forEach((f,i)=>{
   score+=(f.direction==="BUY"?1:f.direction==="SELL"?-1:0)*weights[i];
  });
- const direction=score>=5?"BUY":score<=-5?"SELL":"WAIT";
- const aligned=frames.filter(f=>f.direction===direction).length;
- const strongest=frames[2];
- const volumeOK=strongest.relativeVolume>=0.8;
- const rsiOK=strongest.rsi>35&&strongest.rsi<70;
- const quality=Math.round(Math.min(100,Math.abs(score)/6*75+(volumeOK?15:0)+(rsiOK?10:0)));
- const valid=direction!=="WAIT"&&aligned>=2&&volumeOK&&rsiOK&&quality>=75;
- return {symbol,frames,score,direction,quality,valid,price:strongest.price};
+ const direction=score>=4?"BUY":score<=-4?"SELL":"WAIT";
+ const aligned=direction==="WAIT"?0:
+  frames.filter(f=>f.direction===direction).length;
+ const context=frames.slice(2);
+ const contextAligned=direction==="WAIT"?0:
+  context.filter(f=>f.direction===direction).length;
+ const entry1=frames[0].direction===direction;
+ const entry5=frames[1].direction===direction;
+ const horizon=entry1&&entry5?1:entry5?5:null;
+ const entryContext=frames[2];
+ const volumeOK=entryContext.relativeVolume>=0.65;
+ const rsiOK=direction==="BUY"
+  ? entryContext.rsi>=42&&entryContext.rsi<=74
+  : direction==="SELL"
+   ? entryContext.rsi>=26&&entryContext.rsi<=58
+   : false;
+ const mediumConflict=direction!=="WAIT"&&
+  frames[4].direction!=="NEUTRAL"&&
+  frames[5].direction!=="NEUTRAL"&&
+  frames[4].direction!==direction&&
+  frames[5].direction!==direction;
+ const directionalPoints=Math.abs(score)/21*35;
+ const alignmentPoints=aligned/8*25;
+ const contextPoints=contextAligned/6*20;
+ const quality=Math.round(Math.min(100,
+  directionalPoints+alignmentPoints+contextPoints+
+  (volumeOK?10:0)+(rsiOK?10:0)-
+  (mediumConflict?12:0)));
+ const reasons=[];
+ if(direction==="WAIT")reasons.push("Direção ainda indefinida");
+ if(direction!=="WAIT"&&contextAligned<2)
+  reasons.push("Pouca confirmação nos períodos de contexto");
+ if(mediumConflict)reasons.push("Contradição entre os períodos de 1h e 4h");
+ if(!volumeOK)reasons.push("Volume de 15 minutos abaixo do mínimo");
+ if(!rsiOK)reasons.push("RSI de 15 minutos fora da faixa de validação");
+ if(!horizon)reasons.push("Período de 5 minutos sem alinhamento");
+ if(quality<80)reasons.push("Qualidade abaixo do mínimo de 80/100");
+ const valid=direction!=="WAIT"&&contextAligned>=2&&
+  volumeOK&&rsiOK&&horizon!==null&&aligned>=3&&contextAligned>=2&&!mediumConflict&&quality>=80;
+ const classification=!valid?"AGUARDAR":
+  quality>=80?"ALTA QUALIDADE":"BOA OPORTUNIDADE";
+ return {
+  symbol,frames,score,aligned,contextAligned,
+  direction,quality,classification,valid,horizon,
+  reasons,price:entryContext.price
+ };
 }
 function renderScanner(results){
  $("scannerRows").innerHTML="";
  results.forEach(r=>{
   const tr=document.createElement("tr");
-  const direction=r.direction==="BUY"?"COMPRA":r.direction==="SELL"?"VENDA":"AGUARDAR";
-  [r.symbol,direction,r.quality+"/100",r.valid?"Pré-alerta possível":"Sem oportunidade"].forEach(v=>{
+  const direction=r.direction==="BUY"?"COMPRA":
+   r.direction==="SELL"?"VENDA":"AGUARDAR";
+  let state=r.valid
+   ? (r.classification||"OPORTUNIDADE")+" · CONFIRMADA"
+   : r.direction==="WAIT"?"SEM DIREÇÃO CONFIRMADA":
+    "DIREÇÃO DETECTADA · NÃO CONFIRMADA";
+  if(r.error)state="ERRO: "+r.error;
+  const details=r.valid
+   ? "Horizonte automático: "+r.horizon+" min"
+   : (r.reasons||[]).join("; ")||"Aguardando confirmação";
+  [r.symbol,direction,r.quality+"/100",state+" — "+details].forEach(v=>{
    const td=document.createElement("td");td.textContent=v;tr.appendChild(td);
   });
   $("scannerRows").appendChild(tr);
@@ -258,25 +704,352 @@ function addHistory(text){
   const d=document.createElement("div");d.className="asset";d.textContent=t;$("history").appendChild(d);
  });
 }
+function updateSimulationPanel(){
+ const wins=simulationStats.WIN;
+ const losses=simulationStats.LOSS;
+ const draws=simulationStats.EMPATE;
+ const total=wins+losses+draws;
+ const decided=wins+losses;
+ const winRate=decided?(wins/decided)*100:null;
+ const lossRate=decided?(losses/decided)*100:null;
+
+ $("simWins").textContent=wins;
+ $("simLosses").textContent=losses;
+ $("simDraws").textContent=draws;
+ $("simTotal").textContent=total;
+ $("simWinRate").textContent=winRate===null?"—":winRate.toFixed(1).replace(".",",")+"%";
+ $("simLossRate").textContent=lossRate===null?"—":lossRate.toFixed(1).replace(".",",")+"%";
+ $("simPerformanceBar").style.width=(winRate===null?0:winRate)+"%";
+}
+function brasiliaTime(timestamp){
+ return new Intl.DateTimeFormat("pt-BR",{
+  timeZone:"America/Sao_Paulo",
+  hour:"2-digit",minute:"2-digit",second:"2-digit",
+  hour12:false
+ }).format(new Date(timestamp));
+}
+function addSimulationHistory(text){
+ const row=document.createElement("div");
+ row.className="asset";
+ if(text.startsWith("WIN"))row.classList.add("good");
+ else if(text.startsWith("LOSS"))row.classList.add("bad");
+ else if(text.startsWith("EMPATE"))row.classList.add("neutral");
+ row.textContent=brasiliaTime(Date.now())+" · "+text;
+ $("simHistory").prepend(row);
+ while($("simHistory").children.length>8)$("simHistory").lastElementChild.remove();
+}
+function updateBrasiliaClock(){
+     const now=new Date();
+      $("brasiliaClock").textContent=new Intl.DateTimeFormat("pt-BR",{
+          timeZone:"America/Sao_Paulo",
+            hour:"2-digit",minute:"2-digit",second:"2-digit",
+              hour12:false
+      }).format(now);
+       $("brasiliaDate").textContent=new Intl.DateTimeFormat("pt-BR",{
+          timeZone:"America/Sao_Paulo",
+            day:"2-digit",month:"2-digit",year:"numeric"
+       }).format(now);
+}
+function startBrasiliaClock(){
+     updateBrasiliaClock();
+      if(!brasiliaClockTimer){
+          brasiliaClockTimer=setInterval(updateBrasiliaClock,1000);
+      }
+ renderActiveCountdowns();
+  if(!countdownRefreshTimer){
+      countdownRefreshTimer=setInterval(renderActiveCountdowns,1000);
+  }
+}
+function renderActiveCountdowns(){
+ const panel=$("entryCountdown");
+ if(!panel)return;
+
+ const active=Object.entries(pendingSimulations).filter(([,job])=>
+  !job.cancelled&&job.entered&&Number.isFinite(job.entryAt)&&Number.isFinite(job.exitAt)
+ );
+
+ panel.innerHTML="";
+ panel.hidden=active.length===0;
+
+ active.forEach(([key,job])=>{
+  const remaining=Math.max(0,job.exitAt-Date.now());
+  const seconds=Math.ceil(remaining/1000);
+  const minutes=String(Math.floor(seconds/60)).padStart(2,"0");
+  const secs=String(seconds%60).padStart(2,"0");
+
+  const item=document.createElement("div");
+  item.className="countdown-item";
+
+  const info=document.createElement("div");
+  const name=document.createElement("div");
+  name.className="countdown-name";
+  name.textContent=job.symbol+" · "+(job.direction==="BUY"?"COMPRA":"VENDA");
+
+  const status=document.createElement("div");
+  status.className="countdown-status";
+  status.textContent=job.finishing
+   ?"CONSULTANDO RESULTADO"
+   :job.entered?"ENTRADA CONFIRMADA":"ENTRADA PREVISTA";
+
+  const value=document.createElement("strong");
+  value.className="countdown-time";
+  value.textContent=minutes+":"+secs;
+
+  info.appendChild(name);
+  info.appendChild(status);
+  item.appendChild(info);
+  item.appendChild(value);
+  panel.appendChild(item);
+ });
+}
+async function getSimulationPrice(symbol){
+ const quote=await getJSON("/api/v3/ticker/price?symbol="+encodeURIComponent(symbol));
+ const price=Number(quote.price);
+ if(!Number.isFinite(price)||price<=0)throw new Error("Preço inválido recebido da Binance.");
+ return price;
+}
+function cancelPendingSimulations(){
+ Object.entries(pendingSimulations).forEach(([key,job])=>{
+  job.cancelled=true;
+  if(job.entryTimer)clearTimeout(job.entryTimer);
+  if(job.exitTimer)clearTimeout(job.exitTimer);
+  delete pendingSimulations[key];
+ });
+ renderActiveCountdowns();
+ $("entrySchedule").textContent="Simulações pendentes e cronômetros cancelados pelo usuário.";
+ addSimulationHistory("Monitoramento parado: simulações pendentes canceladas. Nenhum resultado contabilizado.");
+}
+function scheduleSimulation(r){
+ const horizon=Number(r.horizon);
+ const lead=horizon===1||horizon===5?horizon:null;
+ const duration=lead;
+ if(!lead||!r.valid||!running)return;
+
+ const symbol=r.symbol;
+ const direction=r.direction;
+ const key=symbol+"_"+direction;
+ if(pendingSimulations[key])return;
+ const job={
+  entryTimer:null,
+  exitTimer:null,
+  cancelled:false,
+  symbol,
+  direction,
+  entryAt:Date.now()+lead*60000,
+  exitAt:Date.now()+(lead+duration)*60000,
+  entered:false,
+  finishing:false
+ };
+ pendingSimulations[key]=job;
+
+ const entryTime=job.entryAt;
+ const entryLabel=new Date(entryTime).toLocaleTimeString("pt-BR");
+ $("entrySchedule").textContent="Oportunidade: "+symbol+" · "+
+  (direction==="BUY"?"COMPRA":"VENDA")+" · Horizonte automático: "+lead+
+  " min · Entrada prevista: "+entryLabel+" · Simulação: "+duration+" min.";
+ $("autoHorizon").textContent=lead+" minuto"+(lead===1?"":"s");
+ addSimulationHistory("Programada: "+symbol+" · "+entryLabel+
+  " · Horizonte "+lead+" min · Duração "+duration+" min.");
+
+ job.entryTimer=setTimeout(async()=>{
+  if(job.cancelled||!running)return;
+  try{
+   addSimulationHistory("Revalidando sinal: "+symbol+"...");
+   const check=await analyzeSymbol(symbol);
+   if(job.cancelled||!running)return;
+   if(!check.valid||check.direction!==direction||check.horizon!==horizon){
+    const reason=!check.valid
+     ? (check.reasons||[]).join("; ")||"Critérios não confirmados"
+     : "Direção ou horizonte mudou";
+    $("entrySchedule").textContent="SIMULAÇÃO CANCELADA · "+symbol+" · "+reason;
+    addSimulationHistory("CANCELADA: "+symbol+" · "+reason+". Nenhuma entrada contabilizada.");
+    delete pendingSimulations[key];
+    return;
+   }
+  }catch(e){
+   if(job.cancelled||!running)return;
+   const message="Não foi possível revalidar "+symbol+": "+e.message;
+   $("entrySchedule").textContent="SIMULAÇÃO CANCELADA · "+message;
+   addSimulationHistory("CANCELADA: "+message);
+   delete pendingSimulations[key];
+   return;
+  }
+
+  let entryPrice;
+  try{
+   entryPrice=await getSimulationPrice(symbol);
+   if(job.cancelled||!running)return;
+  }catch(e){
+   if(job.cancelled||!running)return;
+   const message="Não foi possível obter o preço de entrada de "+symbol+": "+e.message;
+   $("entrySchedule").textContent=message;
+   addSimulationHistory("Simulação sem resultado: "+message);
+   delete pendingSimulations[key];
+   return;
+  }
+
+  job.entered=true;
+  job.entryAt=Date.now();
+  job.exitAt=job.entryAt+duration*60000;
+  addSimulationHistory("Entrada simulada confirmada: "+symbol+" · USDT "+fmt(entryPrice)+
+   " · Horário: "+brasiliaTime(job.entryAt)+".");
+  renderActiveCountdowns();
+  addSimulationHistory("Cronômetro iniciado: "+symbol+" · "+duration+" minuto(s).");
+  job.exitTimer=setTimeout(async()=>{
+   if(job.cancelled||!running)return;
+   job.finishing=true;
+   renderActiveCountdowns();
+   try{
+    const exitPrice=await getSimulationPrice(symbol);
+    if(job.cancelled||!running)return;
+    const exitAt=Date.now();
+    const change=direction==="BUY"
+     ? (exitPrice-entryPrice)/entryPrice
+     : (entryPrice-exitPrice)/entryPrice;
+    const result=change>0.0005?"WIN":change< -0.0005?"LOSS":"EMPATE";
+    simulationStats[result]++;
+    updateSimulationPanel();
+    addSimulationHistory(result+" · "+symbol+" · Entrada USDT "+fmt(entryPrice)+
+     " · Saída USDT "+fmt(exitPrice)+" · Entrada: "+brasiliaTime(job.entryAt)+
+     " · Saída: "+brasiliaTime(exitAt)+" · Variação favorável: "+(change*100).toFixed(3)+"%.");
+   }catch(e){
+    if(!job.cancelled&&running){
+     addSimulationHistory("Simulação sem resultado: não foi possível consultar o preço final de "+
+      symbol+": "+e.message);
+    }
+   }finally{
+    if(pendingSimulations[key]===job)delete pendingSimulations[key];
+    renderActiveCountdowns();
+   }
+  },duration*60000);
+ },lead*60000);
+}
+function renderSpotRisk(r){
+ const output=$("riskResult");
+ if(!output)return;
+
+ if($("platform").value!=="binance"){
+  output.textContent="Cálculo indisponível: a integração da Stelar Broker ainda está pendente.";
+  return;
+ }
+ if(!r){
+  output.textContent="Aguardando um novo pré-alerta válido da Binance Spot.";
+  return;
+ }
+ if(r.direction!=="BUY"){
+  output.textContent="SINAL DE VENDA: no Binance Spot este módulo não abre posição vendida. Aguarde uma nova oportunidade de COMPRA.";
+  return;
+ }
+ if(r.valid!==true){
+  output.textContent="Pré-alerta não validado. Nenhum cálculo de posição será apresentado.";
+  return;
+ }
+
+ const bank=Number($("riskBank").value);
+ const exposure=Number($("riskExposure").value);
+ const maxLoss=Number($("riskMaxLoss").value);
+ const multiplier=Number($("riskAtrMultiplier").value);
+ if(![bank,exposure,maxLoss,multiplier].every(Number.isFinite)||
+  bank<=0||exposure<=0||exposure>100||maxLoss<=0||
+  multiplier<0.1||multiplier>10){
+  output.textContent="Informe uma banca, um percentual de alocação entre 0 e 100%, uma perda máxima e um multiplicador ATR válidos.";
+  return;
+ }
+
+ const entryFrame=r.frames.find(f=>
+  f.interval===(r.horizon===1?"1m":"5m")
+ );
+ if(!entryFrame||!Number.isFinite(entryFrame.price)||entryFrame.price<=0||
+  !Number.isFinite(entryFrame.atr)||entryFrame.atr<=0){
+  output.textContent="Dados de preço ou ATR insuficientes no período de entrada. Aguardando nova análise.";
+  return;
+ }
+
+ const entry=entryFrame.price;
+ const stopDistance=entryFrame.atr*multiplier;
+ const stop=entry-stopDistance;
+ if(!Number.isFinite(stop)||stop<=0){
+  output.textContent="Não foi possível calcular um preço de stop válido.";
+  return;
+ }
+
+ const exposureCap=bank*exposure/100;
+ const quantityByExposure=exposureCap/entry;
+ const quantityByLoss=maxLoss/stopDistance;
+ const quantity=Math.min(quantityByExposure,quantityByLoss);
+ const positionValue=quantity*entry;
+ const estimatedLoss=quantity*stopDistance;
+ if(![quantity,positionValue,estimatedLoss].every(Number.isFinite)||
+  quantity<=0||positionValue<=0){
+  output.textContent="Não foi possível calcular uma posição válida com os parâmetros informados.";
+  return;
+ }
+
+ output.style.whiteSpace="pre-line";
+ output.textContent=
+  "Estimativa para "+r.symbol+" · Binance Spot\n"+
+  "Preço de referência: USDT "+fmt(entry)+"\n"+
+  "Stop sugerido (ATR × "+fmt(multiplier)+"): USDT "+fmt(stop)+"\n"+
+  "Distância até o stop: USDT "+fmt(stopDistance)+" por unidade\n"+
+  "Exposição máxima configurada: USDT "+fmt(exposureCap)+"\n"+
+  "Valor estimado da posição: USDT "+fmt(positionValue)+"\n"+
+  "Quantidade estimada: "+fmt(quantity)+"\n"+
+  "Perda estimada no stop: USDT "+fmt(estimatedLoss)+
+  " ("+fmt(estimatedLoss/bank*100)+"% da banca)\n\n"+
+  "ATENÇÃO: estimativa baseada no último candle fechado. Não inclui taxas, slippage, gaps ou regras de lote e valor mínimo da Binance. O stop não garante a perda máxima. Não é uma ordem nem uma recomendação automática de entrada.";
+}
 function showWait(reason){
+ latestCandidate=null;
+ renderSpotRisk(null);
  $("brainState").textContent="AGUARDAR";
  $("brainState").className="neutral";
  $("brainReason").textContent=reason;
+ $("autoHorizon").textContent="Aguardando análise";
  $("alertArea").className="signal wait";
  $("alertArea").innerHTML="<b>AGUARDAR — SEM ENTRADA</b><p class='notice'>Nenhuma oportunidade atende aos critérios neste momento.</p>";
 }
 function showCandidate(r){
+ latestCandidate=r;
+ renderSpotRisk(r);
  const direction=r.direction==="BUY"?"COMPRA":"VENDA";
+ const category=r.classification||"OPORTUNIDADE";
+ const alignedPeriods=r.frames
+  .map((f,i)=>f.direction===r.direction?SCAN_INTERVALS[i]:null)
+  .filter(Boolean).join(", ");
  $("brainState").textContent="PRÉ-ALERTA: "+direction;
  $("brainState").className=r.direction==="BUY"?"good":"bad";
- $("score").textContent="Qualidade: "+r.quality+"/100";
- $("brainReason").textContent="Alinhamento observado em "+r.frames.map((f,i)=>SCAN_INTERVALS[i]).join(", ")+". Cenário ainda precisa de confirmação.";
- $("alertArea").className="signal "+(r.direction==="BUY"?"buy":"sell");
- $("alertArea").innerHTML="<b>PRÉ-ALERTA DE "+direction+"</b><p class='notice'>"+r.symbol+" · Qualidade técnica: "+r.quality+"/100</p><p class='notice'>Reavaliar em 5 minutos. Não é ordem nem confirmação de entrada.</p>";
- addHistory("Pré-alerta "+direction+" em "+r.symbol+" ("+r.quality+"/100)");
+ $("score").textContent="Qualidade: "+r.quality+"/100 · "+category;
+ $("brainReason").textContent=
+  "Classificação: "+category+
+  ". Períodos alinhados: "+(alignedPeriods||"nenhum")+
+  ". Horizonte automático: "+r.horizon+
+  " minuto(s). A entrada depende de nova validação.";
+ const alert=$("alertArea");
+ alert.className="signal "+(r.direction==="BUY"?"buy":"sell");
+ alert.replaceChildren();
+
+ const heading=document.createElement("b");
+ heading.textContent=category+" · PRÉ-ALERTA DE "+direction;
+ alert.appendChild(heading);
+
+ const details=document.createElement("p");
+ details.className="notice";
+ details.textContent=r.symbol+" · Qualidade técnica: "+r.quality+"/100";
+ alert.appendChild(details);
+
+ const confirmation=document.createElement("p");
+ confirmation.className="notice";
+ confirmation.textContent=
+  "Períodos alinhados: "+(alignedPeriods||"nenhum")+
+  " · Horizonte: "+r.horizon+
+  " minuto(s). A entrada depende de nova validação.";
+ alert.appendChild(confirmation);
+ addHistory("Pré-alerta "+direction+" em "+r.symbol+
+  " · "+category+" ("+r.quality+"/100)");
+ scheduleSimulation(r);
 }
 async function scan(){
- if(scanBusy||!running)return;
+ if($("platform").value!=="binance"||scanBusy||!running)return;
  scanBusy=true;
  $("scannerState").textContent="Analisando ativos e períodos...";
  setStatus("Analisando");
@@ -306,9 +1079,9 @@ async function scan(){
   const selected=$("symbol").value;
   const chosen=results.find(r=>r.symbol===selected);
   if(chosen){
-   const f=chosen.frames?.[2];
+   const f=chosen.frames?.[3];
    if(f){
-    $("price").textContent="US$ "+fmt(f.price);
+    $("price").textContent="USDT "+fmt(f.price);
     $("rsi").textContent=f.rsi.toFixed(2);
     $("emas").textContent=fmt(f.ema9)+" / "+fmt(f.ema21);
     $("volume").textContent=f.relativeVolume.toFixed(2)+"x";
@@ -329,27 +1102,139 @@ function initChart(){
  const c=$("chart");
  chart=LightweightCharts.createChart(c,{
   width:c.clientWidth,height:c.clientHeight,
-  layout:{background:{color:"#101e31"},textColor:"#b8c8da"},
-  grid:{vertLines:{color:"#1c3047"},horzLines:{color:"#1c3047"}},
-  rightPriceScale:{borderColor:"#344b65"},
-  timeScale:{borderColor:"#344b65",timeVisible:true},
+  layout:{
+   background:{color:"#101e31"},
+   textColor:"#d4e2f2",
+   fontFamily:"Arial, sans-serif",
+   fontSize:13
+  },
+  grid:{vertLines:{color:"#1a2b40"},horzLines:{color:"#1a2b40"}},
+  rightPriceScale:{borderColor:"#405875",minimumWidth:68},
+  timeScale:{
+   borderColor:"#405875",
+   timeVisible:true,
+   secondsVisible:false,
+   rightOffset:8,
+   barSpacing:8
+  },
+  crosshair:{
+   vertLine:{color:"#829bb8",width:1,style:2},
+   horzLine:{color:"#829bb8",width:1,style:2}
+  }
  });
  candleSeries=chart.addCandlestickSeries({
   upColor:"#35d39a",downColor:"#ff8585",
   borderUpColor:"#35d39a",borderDownColor:"#ff8585",
-  wickUpColor:"#35d39a",wickDownColor:"#ff8585"
+  wickUpColor:"#35d39a",wickDownColor:"#ff8585",
+  wickVisible:true,borderVisible:true,priceLineVisible:true
  });
  volumeSeries=chart.addHistogramSeries({
   priceFormat:{type:"volume"},priceScaleId:"",
   scaleMargins:{top:.82,bottom:0}
  });
- window.addEventListener("resize",()=>chart.applyOptions({width:c.clientWidth}));
+ const resizeChart=()=>{
+  if(!chart||!c.isConnected)return;
+  const width=c.clientWidth;
+  const height=c.clientHeight;
+  if(width>0&&height>0)chart.resize(width,height);
+ };
+ if(typeof ResizeObserver!=="undefined"){
+  const observer=new ResizeObserver(resizeChart);
+  observer.observe(c);
+ }else{
+  window.addEventListener("resize",resizeChart);
+ }
+}
+function stopChartSocket(){
+ if(chartReconnectTimer){
+  clearTimeout(chartReconnectTimer);
+  chartReconnectTimer=null;
+ }
+ if(chartSocket){
+  const old=chartSocket;
+  chartSocket=null;
+  old.onclose=null;
+  old.onerror=null;
+  old.onmessage=null;
+  old.close();
+ }
+}
+function connectChartSocket(symbol,interval,generation){
+ if(generation!==chartLoadId)return;
+ const url="wss://stream.binance.com:9443/ws/"+
+  symbol.toLowerCase()+"@kline_"+interval;
+ try{
+  const socket=new WebSocket(url);
+  chartSocket=socket;
+  socket.onopen=()=>{
+   if(generation===chartLoadId){
+    $("message").textContent="Gráfico conectado ao fluxo de preços em tempo real.";
+   }else{
+    socket.close();
+   }
+  };
+  socket.onmessage=event=>{
+   if(generation!==chartLoadId)return;
+   try{
+    const message=JSON.parse(event.data);
+    const k=message.k;
+    if(!k)return;
+    const candle={
+     time:Math.floor(Number(k.t)/1000),
+     open:Number(k.o),
+     high:Number(k.h),
+     low:Number(k.l),
+     close:Number(k.c)
+    };
+    const volume=Number(k.v);
+    if(!Object.values(candle).every(Number.isFinite)||!Number.isFinite(volume)||volume<0){
+     throw new Error("Dados de candle inválidos.");
+    }
+    candleSeries.update(candle);
+    volumeSeries.update({
+     time:candle.time,
+     value:volume,
+     color:candle.close>=candle.open?"rgba(53,211,154,.45)":"rgba(255,133,133,.45)"
+    });
+   }catch(e){
+    $("message").textContent="Não foi possível atualizar o candle: "+e.message;
+   }
+  };
+  socket.onerror=()=>{
+   if(generation===chartLoadId){
+    $("message").textContent="Conexão em tempo real instável. Tentando reconectar.";
+   }
+  };
+  socket.onclose=()=>{
+   if(chartSocket===socket)chartSocket=null;
+   if(generation===chartLoadId){
+    chartReconnectTimer=setTimeout(()=>connectChartSocket(symbol,interval,generation),5000);
+   }
+  };
+ }catch(e){
+  if(generation===chartLoadId){
+   $("message").textContent="Falha ao iniciar o fluxo em tempo real: "+e.message;
+   chartReconnectTimer=setTimeout(()=>connectChartSocket(symbol,interval,generation),5000);
+  }
+ }
 }
 async function loadChart(){
+ const generation=++chartLoadId;
+ stopChartSocket();
+ if($("platform").value!=="binance"){
+  if(candleSeries&&volumeSeries){
+   candleSeries.setData([]);
+   volumeSeries.setData([]);
+  }
+  $("chartTitle").textContent="Stelar Broker — integração pendente";
+  return;
+ }
  try{
   if(!chart)initChart();
-  const symbol=$("symbol").value,interval=$("interval").value;
+  const symbol=$("symbol").value;
+  const interval=$("interval").value;
   const raw=await getJSON("/api/v3/klines?symbol="+symbol+"&interval="+interval+"&limit=150");
+  if(generation!==chartLoadId)return;
   const data=parseCandles(raw).raw;
   candleSeries.setData(data.map(c=>({
    time:Math.floor(Number(c[0])/1000),
@@ -361,11 +1246,38 @@ async function loadChart(){
   })));
   chart.timeScale().fitContent();
   $("chartTitle").textContent=symbol.replace("USDT"," / USDT");
+  connectChartSocket(symbol,interval,generation);
  }catch(e){
-  $("message").textContent="Erro no gráfico: "+e.message;
+  if(generation===chartLoadId){
+   $("message").textContent="Erro no gráfico: "+e.message;
+   if(candleSeries&&volumeSeries){
+    connectChartSocket($("symbol").value,$("interval").value,generation);
+   }
+  }
  }
 }
+function toggleScanner(){
+ const content=$("scannerContent");
+ const button=$("scannerToggle");
+ const collapsed=content.style.display!=="none";
+ content.style.display=collapsed?"none":"block";
+ button.textContent=collapsed?"▲ Expandir scanner":"▼ Minimizar";
+ button.setAttribute("aria-expanded",String(!collapsed));
+}
+function toggleEntryConfiguration(){
+ const content=$("entryConfigContent");
+ const button=$("entryConfigToggle");
+ const collapsed=content.style.display!=="none";
+ content.style.display=collapsed?"none":"block";
+ button.textContent=collapsed?"▼":"▲";
+ button.setAttribute("aria-expanded",String(!collapsed));
+ button.setAttribute("aria-label",collapsed?"Expandir configuração de entrada":"Recolher configuração de entrada");
+}
 function startScanner(){
+ if($("platform").value!=="binance"){
+  $("message").textContent="A integração de dados da Stelar Broker ainda não está disponível.";
+  return;
+ }
  if(running)return;
  running=true;
  $("start").disabled=true;$("stop").disabled=false;
@@ -378,13 +1290,59 @@ function stopScanner(){
  running=false;
  if(timer)clearInterval(timer);
  timer=null;
+ cancelPendingSimulations();
  $("start").disabled=false;$("stop").disabled=true;
  setStatus("Pausado");
  $("scannerState").textContent="Monitoramento pausado.";
  showWait("Monitoramento interrompido pelo usuário.");
 }
+function changePlatform(){
+ const platform=$("platform").value;
+ latestCandidate=null;
+ renderSpotRisk(null);
+
+ if(platform==="stelar"){
+  if(running)stopScanner();
+  else cancelPendingSimulations();
+
+  running=false;
+  if(timer)clearInterval(timer);
+  timer=null;
+  ++chartLoadId;
+  stopChartSocket();
+
+  if(candleSeries&&volumeSeries){
+   candleSeries.setData([]);
+   volumeSeries.setData([]);
+  }
+
+  $("start").disabled=true;
+  $("stop").disabled=true;
+  $("status").textContent="Integração pendente";
+  $("message").textContent="Stelar Broker selecionada. A integração de dados ainda não está disponível. Nenhuma consulta à Binance será feita.";
+  $("chartTitle").textContent="Stelar Broker — aguardando integração";
+  $("scannerState").textContent="Scanner aguardando integração da Stelar.";
+  $("scannerRows").innerHTML="<tr><td colspan='4'>Integração da Stelar ainda não disponível.</td></tr>";
+  $("updated").textContent="Aguardando integração da Stelar.";
+  $("alertArea").innerHTML="<p class='notice'>Stelar selecionada. Nenhuma cotação disponível até a integração.</p>";
+  return;
+ }
+
+ $("start").disabled=false;
+ $("stop").disabled=!running;
+ $("status").textContent="Aguardando";
+ $("message").textContent="Binance Spot selecionada. Serão usados somente dados públicos da Binance.";
+ $("scannerState").textContent="Scanner desligado.";
+ loadChart();
+}
+
+["riskBank","riskExposure","riskMaxLoss","riskAtrMultiplier"].forEach(id=>{
+ $(id).addEventListener("input",()=>renderSpotRisk(latestCandidate));
+});
+$("platform").addEventListener("change",changePlatform);
 $("symbol").addEventListener("change",loadChart);
 $("interval").addEventListener("change",loadChart);
+startBrasiliaClock();
 try{initChart()}catch(e){$("message").textContent="O gráfico será carregado quando a biblioteca estiver disponível."}
 </script>
 </body>
