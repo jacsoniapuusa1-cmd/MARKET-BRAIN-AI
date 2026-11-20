@@ -40,14 +40,20 @@ input{width:100%;margin-top:6px;border:1px solid var(--line);border-radius:10px;
 .risk-field{min-width:0}
 .risk-result{background:#0b192b;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px}
 #chart{height:310px;width:100%;margin-top:10px}
-.clock-panel{background:#0b192b;border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:12px;text-align:center}
+.clock-panel{background:#0b192b;border:1px solid var(--line);border-radius:12px;padding:8px 11px;margin-top:8px;text-align:center}
 .clock-caption{font-size:10px;letter-spacing:1.4px;color:var(--muted)}
-#brasiliaClock{display:block;font-size:29px;font-weight:850;font-variant-numeric:tabular-nums;margin-top:3px}
-#brasiliaDate{font-size:11px;color:var(--muted)}
+#brasiliaClock{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}
+#brasiliaDate{font-size:10px;color:var(--muted)}
 #entryCountdown[hidden]{display:none}
 .countdown-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line);text-align:left}
 .countdown-name{font-size:12px;font-weight:750}
 .countdown-status{font-size:10px;color:var(--muted);margin-top:3px}
+.simulation-activity{max-height:180px;overflow:auto}
+.statistics-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+.statistics-assets{margin-top:12px}
+.statistics-assets table{font-variant-numeric:tabular-nums}
+.statistics-archive{margin-top:12px}
+@media(max-width:420px){.statistics-controls{grid-template-columns:1fr}}
 .countdown-time{font-size:18px;font-variant-numeric:tabular-nums}
 .asset{padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.6}
 .asset:last-child{border:0}
@@ -224,7 +230,7 @@ input:focus,select:focus{
 .clock-caption{color:#c1d9f2}
 #brasiliaClock{
  color:#70efff;
- text-shadow:0 0 15px rgba(101,240,255,.35);
+ text-shadow:0 0 10px rgba(101,240,255,.28);
 }
 #brasiliaDate{color:#c1d9f2}
 .countdown-status{color:#c1d9f2}
@@ -449,6 +455,20 @@ box-shadow:none;
 <div class="card">
  <div style="background:#101e31;border:1px solid #23364f;border-radius:12px;padding:14px;margin:12px 0">
   <div class="section">Resultados das simulações</div>
+  <div class="statistics-controls">
+   <label class="muted" for="statsRange">Período estatístico
+    <select id="statsRange">
+     <option value="today">Hoje</option>
+     <option value="week">Semana</option>
+     <option value="month">Mês</option>
+     <option value="all" selected>Todo o período</option>
+    </select>
+   </label>
+   <label class="muted" for="statsArchive">Período consultado
+    <select id="statsArchive"><option value="active">Período atual</option></select>
+   </label>
+  </div>
+  <div id="statsReference" class="notice" aria-live="polite"></div>
   <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center">
    <div><strong id="simWins">0</strong><div>WIN</div></div>
    <div><strong id="simLosses">0</strong><div>LOSS</div></div>
@@ -459,10 +479,19 @@ box-shadow:none;
    <div class="metric"><span class="muted">TAXA DE ACERTO</span><b id="simWinRate" class="good">—</b></div>
    <div class="metric"><span class="muted">TAXA DE ERRO</span><b id="simLossRate" class="bad">—</b></div>
   </div>
+  <div class="notice" style="margin-top:7px">Taxas calculadas sobre WIN e LOSS; empates e simulações inconclusivas não alteram os percentuais.</div>
   <div style="height:10px;background:#26364a;border-radius:99px;overflow:hidden;margin-top:10px">
    <div id="simPerformanceBar" style="height:100%;width:0%;background:linear-gradient(90deg,#35d39a,#55dfff);border-radius:99px;transition:width .3s"></div>
   </div>
+  <div id="simInconclusive" class="notice" style="margin-top:8px"></div>
+  <div id="statsByAsset" class="statistics-assets"></div>
+  <button id="resetStatistics" type="button">REDEFINIR ESTATÍSTICAS</button>
+  <div class="statistics-archive">
+   <div class="section">Arquivos de períodos anteriores</div>
+   <div id="statisticsArchives" class="notice">Nenhum período arquivado.</div>
+  </div>
   <div id="simHistory" style="margin-top:12px;color:#91a4bd">Nenhuma simulação realizada.</div>
+  <div id="simActivity" class="simulation-activity" aria-live="polite"></div>
   <p style="font-size:12px;color:#91a4bd">Resultados simulados com base na variação observada dos preços. Não são operações reais nem garantia de lucro.</p>
  </div>
  <div class="section">Segurança operacional</div>
@@ -483,13 +512,25 @@ const fmt=n=>Number(n).toLocaleString("pt-BR",{maximumFractionDigits:6});
 let chart=null,candleSeries=null,volumeSeries=null;
 let chartSocket=null,chartReconnectTimer=null,chartLoadId=0;
 let running=false,timer=null,scanBusy=false;
+let scanGeneration=0,resumeScanRequested=false;
 let previousAlerts={};
 let historyItems=[];
 let simulationStats={WIN:0,LOSS:0,EMPATE:0};
+const SIMULATION_STORAGE_KEY="marketBrainAI.simulationHistory.v1";
+const SIMULATION_ARCHIVE_STORAGE_KEY="marketBrainAI.simulationArchives.v1";
+const SIMULATION_PENDING_STORAGE_KEY="marketBrainAI.pendingSimulations.v1";
+let simulationRecords=[];
+let simulationIdSequence=0;
+let currentPerformancePeriodId="";
+let currentPerformancePeriodStartedAt=Date.now();
+let simulationArchives=[];
+let selectedStatsRange="all";
+let selectedStatsArchive="active";
 let pendingSimulations={};
 let brasiliaClockTimer=null;
 let countdownRefreshTimer=null;
 let latestCandidate=null;
+let appHiddenAt=null,resumeInProgress=false,resumeRequested=false;
 
 async function getJSON(path){
  if(typeof path!=="string"||!path.startsWith("/")){
@@ -705,6 +746,23 @@ function addHistory(text){
  });
 }
 function updateSimulationPanel(){
+ const view=getSelectedStatisticsView();
+ const latestRecordAt=view.records.reduce((latest,record)=>
+  Math.max(latest,record.recordedAt),view.endedAt
+ );
+ const bounds=getStatisticsRangeBounds(
+  selectedStatsRange,view.startedAt,latestRecordAt
+ );
+ const records=view.records.filter(record=>
+  record.recordedAt>=bounds.start&&record.recordedAt<=bounds.end
+ );
+ simulationStats={WIN:0,LOSS:0,EMPATE:0};
+ records.forEach(record=>{
+  if(record.status==="completed"&&
+   Object.prototype.hasOwnProperty.call(simulationStats,record.result)){
+   simulationStats[record.result]++;
+  }
+ });
  const wins=simulationStats.WIN;
  const losses=simulationStats.LOSS;
  const draws=simulationStats.EMPATE;
@@ -720,6 +778,533 @@ function updateSimulationPanel(){
  $("simWinRate").textContent=winRate===null?"—":winRate.toFixed(1).replace(".",",")+"%";
  $("simLossRate").textContent=lossRate===null?"—":lossRate.toFixed(1).replace(".",",")+"%";
  $("simPerformanceBar").style.width=(winRate===null?0:winRate)+"%";
+ $("simInconclusive").textContent="Simulações inconclusivas (fora das taxas): "+
+  records.filter(record=>record.status==="inconclusive").length;
+ $("statsReference").textContent="Referência: "+brasiliaDate(bounds.start)+
+  " a "+brasiliaDate(bounds.end)+
+  (view.archive?" · Arquivo do período":" · Período atual");
+ renderStatisticsByAsset(records);
+ $("resetStatistics").disabled=simulationArchives.some(archive=>
+  archive.periodId===currentPerformancePeriodId
+ );
+}
+function reportSimulationStorageError(action,error){
+ console.warn("Não foi possível "+action+" o histórico das simulações.",error);
+ addSimulationHistory("AVISO: falha ao "+action+
+  ". Os resultados continuam disponíveis nesta sessão.");
+}
+function isValidSimulationRecord(record){
+ if(!record||typeof record!=="object"||typeof record.id!=="string"||
+  !record.id||typeof record.symbol!=="string"||!record.symbol||
+  !["BUY","SELL"].includes(record.direction)||
+  !Number.isFinite(record.entryAt)||!Number.isFinite(record.exitAt)||
+  !Number.isFinite(record.recordedAt)||
+  !(Number.isFinite(record.entryPrice)&&record.entryPrice>0||
+   record.status==="inconclusive"&&record.entryPrice===null)||
+  !(record.exitPrice===null||
+   (Number.isFinite(record.exitPrice)&&record.exitPrice>0))){
+  return false;
+ }
+ if(record.status==="completed"){
+  return ["WIN","LOSS","EMPATE"].includes(record.result)&&
+   Number.isFinite(record.exitPrice)&&Number.isFinite(record.changePercent);
+ }
+ return record.status==="inconclusive"&&record.result===null&&
+  record.changePercent===null&&typeof record.reason==="string";
+}
+function isValidSimulationArchive(archive){
+ return archive&&typeof archive.id==="string"&&archive.id.length>0&&
+  typeof archive.periodId==="string"&&archive.periodId.length>0&&
+  Number.isFinite(archive.startedAt)&&Number.isFinite(archive.endedAt)&&
+  Number.isFinite(archive.archivedAt)&&Array.isArray(archive.recordIds)&&
+  archive.recordIds.every(id=>typeof id==="string");
+}
+function isValidPendingSimulation(job){
+ return job&&typeof job==="object"&&typeof job.id==="string"&&job.id.length>0&&
+  typeof job.periodId==="string"&&job.periodId.length>0&&
+  typeof job.symbol==="string"&&job.symbol.length>0&&
+  ["BUY","SELL"].includes(job.direction)&&
+  Number.isFinite(job.entryAt)&&Number.isFinite(job.exitAt)&&
+  (job.entryPrice===null||
+   Number.isFinite(job.entryPrice)&&job.entryPrice>0)&&
+  job.exitAt>job.entryAt&&
+  typeof job.entered==="boolean"&&
+  Number.isFinite(job.horizon)&&(job.horizon===1||job.horizon===5)&&
+  (job.entered?job.entryPrice!==null&&job.exitAt>job.entryAt:
+   job.entryPrice===null);
+}
+function brasiliaDateParts(timestamp){
+ const parts=new Intl.DateTimeFormat("en-US",{
+  timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"
+ }).formatToParts(new Date(timestamp));
+ return Object.fromEntries(parts.filter(part=>part.type!=="literal")
+  .map(part=>[part.type,Number(part.value)]));
+}
+function brasiliaDate(timestamp){
+ return new Intl.DateTimeFormat("pt-BR",{
+  timeZone:"America/Sao_Paulo",day:"2-digit",month:"2-digit",year:"numeric"
+ }).format(new Date(timestamp));
+}
+function startOfBrasiliaDay(timestamp){
+ const {year,month,day}=brasiliaDateParts(timestamp);
+ return Date.UTC(year,month-1,day)-3*60*60*1000;
+}
+function getStatisticsRangeBounds(range,periodStartedAt,periodEndedAt){
+ const now=Math.min(Date.now(),periodEndedAt);
+ if(range==="all")return {start:periodStartedAt,end:periodEndedAt};
+ const todayStart=startOfBrasiliaDay(now);
+ if(range==="today")return {start:todayStart,end:periodEndedAt};
+ if(range==="month"){
+  const {year,month}=brasiliaDateParts(now);
+  return {start:Date.UTC(year,month-1,1)-3*60*60*1000,end:periodEndedAt};
+ }
+ const dayOfWeek=new Date(todayStart+3*60*60*1000).getUTCDay();
+ const daysSinceMonday=(dayOfWeek+6)%7;
+ return {start:todayStart-daysSinceMonday*24*60*60*1000,end:periodEndedAt};
+}
+function getSelectedStatisticsView(){
+ const archive=simulationArchives.find(item=>item.id===selectedStatsArchive);
+ if(archive){
+  const recordIds=new Set(archive.recordIds);
+  return {
+   archive:true,
+   startedAt:archive.startedAt,
+   endedAt:archive.endedAt,
+   records:simulationRecords.filter(record=>
+    record.periodId===archive.periodId||recordIds.has(record.id)
+   )
+  };
+ }
+ selectedStatsArchive="active";
+ return {
+  archive:false,
+  startedAt:currentPerformancePeriodStartedAt,
+  endedAt:Date.now(),
+  records:simulationRecords.filter(record=>
+   record.periodId===currentPerformancePeriodId
+  )
+ };
+}
+function renderStatisticsByAsset(records){
+ const panel=$("statsByAsset");
+ const totals=new Map();
+ records.filter(record=>record.status==="completed").forEach(record=>{
+  if(!totals.has(record.symbol)){
+   totals.set(record.symbol,{WIN:0,LOSS:0,EMPATE:0});
+  }
+  totals.get(record.symbol)[record.result]++;
+ });
+ panel.replaceChildren();
+ if(!totals.size){
+  panel.textContent="Sem entradas concluídas por ativo neste período.";
+  return;
+ }
+ const table=document.createElement("table");
+ const head=document.createElement("thead");
+ const header=document.createElement("tr");
+ ["Ativo","Total concluídas","WIN","LOSS","EMPATE","Acerto","Erro"].forEach(label=>{
+  const cell=document.createElement("th");
+  cell.textContent=label;
+  header.appendChild(cell);
+ });
+ head.appendChild(header);
+ table.appendChild(head);
+ const body=document.createElement("tbody");
+ Array.from(totals.entries()).sort(([a],[b])=>a.localeCompare(b))
+  .forEach(([symbol,counts])=>{
+   const row=document.createElement("tr");
+   const completed=counts.WIN+counts.LOSS+counts.EMPATE;
+   const decided=counts.WIN+counts.LOSS;
+   const winRate=decided?counts.WIN/decided*100:null;
+   const lossRate=decided?counts.LOSS/decided*100:null;
+   [symbol,completed,counts.WIN,counts.LOSS,counts.EMPATE,
+    winRate===null?"—":winRate.toFixed(1).replace(".",",")+"%",
+    lossRate===null?"—":lossRate.toFixed(1).replace(".",",")+"%"].forEach(value=>{
+    const cell=document.createElement("td");
+    cell.textContent=value;
+    row.appendChild(cell);
+   });
+   body.appendChild(row);
+  });
+ table.appendChild(body);
+ panel.appendChild(table);
+}
+function renderStatisticsArchives(){
+ const select=$("statsArchive");
+ const list=$("statisticsArchives");
+ const previousSelection=selectedStatsArchive;
+ select.replaceChildren();
+ const currentOption=document.createElement("option");
+ currentOption.value="active";
+ currentOption.textContent="Período atual";
+ select.appendChild(currentOption);
+ const sorted=simulationArchives.slice().sort((a,b)=>b.archivedAt-a.archivedAt);
+ sorted.forEach(archive=>{
+  const option=document.createElement("option");
+  option.value=archive.id;
+  option.textContent="Arquivo · "+brasiliaDate(archive.startedAt)+
+   " a "+brasiliaDate(archive.endedAt);
+  select.appendChild(option);
+ });
+ selectedStatsArchive=sorted.some(archive=>archive.id===previousSelection)
+  ?previousSelection:"active";
+ select.value=selectedStatsArchive;
+ list.replaceChildren();
+ if(!sorted.length){
+  list.textContent="Nenhum período arquivado.";
+  return;
+ }
+ sorted.forEach(archive=>{
+  const row=document.createElement("div");
+  row.className="asset";
+  const button=document.createElement("button");
+  button.type="button";
+  button.textContent="Consultar arquivo · "+brasiliaDate(archive.startedAt)+
+   " a "+brasiliaDate(archive.endedAt);
+  button.addEventListener("click",()=>{
+   selectedStatsArchive=archive.id;
+   select.value=archive.id;
+   updateSimulationPanel();
+  });
+  const completedCount=archive.recordIds.reduce((count,id)=>{
+   const record=simulationRecords.find(item=>item.id===id);
+   return count+(record&&record.status==="completed"?1:0);
+  },0);
+   const periodCompletedCount=simulationRecords.filter(record=>
+    record.periodId===archive.periodId&&record.status==="completed"
+   ).length;
+  const description=document.createElement("div");
+  description.className="muted";
+  description.textContent=Math.max(completedCount,periodCompletedCount)+
+   " entrada(s) concluída(s) arquivada(s).";
+  row.appendChild(button);
+  row.appendChild(description);
+  list.appendChild(row);
+ });
+}
+function persistArchiveState(state){
+ try{
+  window.localStorage.setItem(SIMULATION_ARCHIVE_STORAGE_KEY,
+   JSON.stringify({version:1,...state}));
+  return true;
+ }catch(e){
+  reportSimulationStorageError("salvar os arquivos estatísticos",e);
+  return false;
+ }
+}
+function renderSimulationHistory(){
+ const panel=$("simHistory");
+ panel.replaceChildren();
+ const recent=simulationRecords.slice().sort((a,b)=>
+  b.recordedAt-a.recordedAt
+ ).slice(0,8);
+ if(!recent.length){
+  panel.textContent="Nenhuma simulação realizada.";
+  return;
+ }
+
+ recent.forEach(record=>{
+  const row=document.createElement("div");
+  row.className="asset";
+  const result=record.status==="inconclusive"?"INCONCLUSIVA":record.result;
+  if(record.result==="WIN")row.classList.add("good");
+  else if(record.result==="LOSS")row.classList.add("bad");
+  else row.classList.add("neutral");
+  const direction=record.direction==="BUY"?"COMPRA":"VENDA";
+  const exitPrice=record.exitPrice===null
+   ?"não consultada":"USDT "+fmt(record.exitPrice);
+  const entryPrice=record.entryPrice===null
+   ?"não obtido":"USDT "+fmt(record.entryPrice);
+  const variation=record.changePercent===null
+   ?"Variação indisponível":"Variação "+record.changePercent.toFixed(3)+"%";
+  row.textContent=(record.date||brasiliaDate(record.recordedAt))+" "+
+   (record.time||brasiliaTime(record.recordedAt))+" · "+result+" · "+
+   record.symbol+" · "+direction+" · Entrada: "+
+   (record.entryDate||brasiliaDate(record.entryAt))+" "+
+   (record.entryTime||brasiliaTime(record.entryAt))+
+   " / "+entryPrice+" · "+
+   (record.status==="inconclusive"?"Saída prevista: ":"Saída: ")+
+   (record.exitDate||brasiliaDate(record.exitAt))+" "+
+   (record.exitTime||brasiliaTime(record.exitAt))+
+   " / "+exitPrice+" · "+variation+
+   (record.reason?" · Motivo: "+record.reason:"");
+  panel.appendChild(row);
+ });
+}
+function normalizeSimulationRecord(record,periodId){
+ return {
+  ...record,
+  periodId:record.periodId||periodId,
+  date:record.date||brasiliaDate(record.recordedAt),
+  time:record.time||brasiliaTime(record.recordedAt),
+  entryDate:record.entryDate||brasiliaDate(record.entryAt),
+  entryTime:record.entryTime||brasiliaTime(record.entryAt),
+  exitDate:record.exitDate||brasiliaDate(record.exitAt),
+  exitTime:record.exitTime||brasiliaTime(record.exitAt)
+ };
+}
+function persistPendingSimulations(){
+ try{
+  const pending=Object.values(pendingSimulations)
+   .filter(job=>!job.cancelled)
+   .map(job=>({
+    id:job.id,periodId:job.periodId,symbol:job.symbol,
+    direction:job.direction,entryAt:job.entryAt,exitAt:job.exitAt,
+    entryPrice:job.entered?job.entryPrice:null,entered:job.entered,
+    horizon:job.horizon
+   }));
+  window.localStorage.setItem(SIMULATION_PENDING_STORAGE_KEY,
+   JSON.stringify(pending));
+  return true;
+ }catch(e){
+  reportSimulationStorageError("salvar as simulações pendentes",e);
+  return false;
+ }
+}
+function loadPendingSimulations(){
+ let pending=[];
+ try{
+  const stored=window.localStorage.getItem(SIMULATION_PENDING_STORAGE_KEY);
+  if(stored!==null){
+   const parsed=JSON.parse(stored);
+   if(!Array.isArray(parsed))throw new Error("Formato de simulações pendentes inválido.");
+   pending=parsed;
+  }
+ }catch(e){
+  reportSimulationStorageError("carregar as simulações pendentes",e);
+ }
+ let changed=false;
+ pending.forEach(saved=>{
+  if(!isValidPendingSimulation(saved)||
+   simulationRecords.some(record=>record.id===saved.id)){
+   changed=true;
+   return;
+  }
+  const key=saved.symbol+"_"+saved.direction;
+  if(pendingSimulations[key]){
+   changed=true;
+   return;
+  }
+  const job={
+   ...saved,entryTimer:null,exitTimer:null,cancelled:false,finishing:false
+  };
+  pendingSimulations[key]=job;
+ });
+ Object.entries(pendingSimulations).forEach(([key,job])=>{
+  if(!job.entered&&job.entryAt<=Date.now()){
+   markSimulationInconclusive(
+    key,job,"o horário de entrada passou enquanto a página estava fechada; nenhuma entrada atrasada foi executada"
+   );
+  }else if(job.entered&&job.exitAt<=Date.now()){
+   markSimulationInconclusive(
+    key,job,"o horário de encerramento passou enquanto a página estava fechada; não há cotação histórica confiável"
+   );
+  }else if(job.entered){
+   armSimulationExit(key,job);
+  }
+ });
+ if(changed)persistPendingSimulations();
+ renderActiveCountdowns();
+}
+function loadSimulationHistory(){
+ let archiveStateLoaded=false;
+ try{
+  const storedState=window.localStorage.getItem(SIMULATION_ARCHIVE_STORAGE_KEY);
+  if(storedState!==null){
+   const state=JSON.parse(storedState);
+   if(state.version!==1||typeof state.currentPeriodId!=="string"||
+    !state.currentPeriodId||
+    !Number.isFinite(state.currentPerformancePeriodStartedAt)||
+    !Array.isArray(state.archives)){
+    throw new Error("Formato do arquivo estatístico inválido.");
+   }
+   const uniqueArchives=new Map();
+   state.archives.forEach(archive=>{
+    if(isValidSimulationArchive(archive)&&
+     !uniqueArchives.has(archive.periodId)){
+     uniqueArchives.set(archive.periodId,{
+      ...archive,recordIds:Array.from(new Set(archive.recordIds))
+     });
+    }
+   });
+   simulationArchives=Array.from(uniqueArchives.values());
+   currentPerformancePeriodId=state.currentPeriodId;
+   currentPerformancePeriodStartedAt=state.currentPerformancePeriodStartedAt;
+   archiveStateLoaded=true;
+  }
+ }catch(e){
+  reportSimulationStorageError("carregar os arquivos estatísticos",e);
+ }
+ if(!currentPerformancePeriodId){
+  currentPerformancePeriodId="period-"+createSimulationId();
+ }
+
+ let parsedRecords=[];
+ try{
+  const storedRecords=window.localStorage.getItem(SIMULATION_STORAGE_KEY);
+  if(storedRecords!==null){
+   const parsed=JSON.parse(storedRecords);
+   if(!Array.isArray(parsed))throw new Error("Formato de histórico inválido.");
+   parsedRecords=parsed;
+  }
+ }catch(e){
+  reportSimulationStorageError("carregar",e);
+ }
+ const uniqueRecords=new Map();
+ let recordsNeedMigration=false;
+ parsedRecords.forEach(record=>{
+  if(!isValidSimulationRecord(record))return;
+  if(uniqueRecords.has(record.id)){
+   recordsNeedMigration=true;
+   return;
+  }
+  const normalized=normalizeSimulationRecord(record,currentPerformancePeriodId);
+  if(normalized.periodId!==record.periodId||!record.date||!record.time||
+   !record.entryDate||!record.entryTime||!record.exitDate||!record.exitTime){
+   recordsNeedMigration=true;
+  }
+  uniqueRecords.set(record.id,normalized);
+ });
+ simulationRecords=Array.from(uniqueRecords.values());
+ let archivesChanged=false;
+ simulationArchives=simulationArchives.map(archive=>{
+  const periodRecords=simulationRecords.filter(record=>
+   record.periodId===archive.periodId
+  );
+  const recordIds=Array.from(new Set([
+   ...archive.recordIds,...periodRecords.map(record=>record.id)
+  ]));
+  const endedAt=Math.max(archive.endedAt,...periodRecords.map(record=>record.recordedAt));
+  if(recordIds.length!==archive.recordIds.length||endedAt!==archive.endedAt){
+   archivesChanged=true;
+   return {...archive,recordIds,endedAt};
+  }
+  return archive;
+ });
+ if(!archiveStateLoaded){
+  const firstRecord=simulationRecords.reduce((first,record)=>
+   Math.min(first,record.recordedAt),Date.now());
+  currentPerformancePeriodStartedAt=simulationRecords.length?firstRecord:Date.now();
+ }
+ if(recordsNeedMigration){
+  try{
+   window.localStorage.setItem(
+    SIMULATION_STORAGE_KEY,JSON.stringify(simulationRecords)
+   );
+  }catch(e){
+   reportSimulationStorageError("migrar",e);
+  }
+ }
+ if(!archiveStateLoaded){
+  persistArchiveState({
+   currentPeriodId:currentPerformancePeriodId,
+   currentPerformancePeriodStartedAt,
+   archives:simulationArchives
+  });
+ }else if(archivesChanged){
+  persistArchiveState({
+   currentPeriodId:currentPerformancePeriodId,
+   currentPerformancePeriodStartedAt,
+   archives:simulationArchives
+  });
+ }
+ loadPendingSimulations();
+ renderStatisticsArchives();
+ updateSimulationPanel();
+ renderSimulationHistory();
+}
+function saveSimulationRecord(record){
+ if(simulationRecords.some(saved=>saved.id===record.id))return false;
+ const savedRecord=normalizeSimulationRecord(
+  record,record.periodId||currentPerformancePeriodId
+ );
+ simulationRecords.push(savedRecord);
+ updateSimulationPanel();
+ renderSimulationHistory();
+ try{
+  window.localStorage.setItem(
+   SIMULATION_STORAGE_KEY,JSON.stringify(simulationRecords)
+  );
+ }catch(e){
+  reportSimulationStorageError("salvar",e);
+ }
+ const archivedPeriod=simulationArchives.find(archive=>
+  archive.periodId===savedRecord.periodId
+ );
+ if(archivedPeriod){
+  archivedPeriod.recordIds=Array.from(new Set([
+   ...archivedPeriod.recordIds,savedRecord.id
+  ]));
+  archivedPeriod.endedAt=Math.max(
+   archivedPeriod.endedAt,savedRecord.recordedAt
+  );
+  persistArchiveState({
+   currentPeriodId:currentPerformancePeriodId,
+   currentPerformancePeriodStartedAt,
+   archives:simulationArchives
+  });
+ }
+ return true;
+}
+function archiveCurrentPerformancePeriod(){
+ if(simulationArchives.some(archive=>
+  archive.periodId===currentPerformancePeriodId)){
+  return false;
+ }
+ const archivedAt=Date.now();
+ const records=simulationRecords.filter(record=>
+  record.periodId===currentPerformancePeriodId
+ );
+ const archive={
+  id:"archive-"+createSimulationId(),
+  periodId:currentPerformancePeriodId,
+  startedAt:currentPerformancePeriodStartedAt,
+  endedAt:archivedAt,
+  archivedAt,
+  recordIds:Array.from(new Set(records.map(record=>record.id)))
+ };
+ const nextPeriodId="period-"+createSimulationId();
+ const nextArchives=[...simulationArchives,archive];
+ if(!persistArchiveState({
+  currentPeriodId:nextPeriodId,
+  currentPerformancePeriodStartedAt:archivedAt,
+  archives:nextArchives
+ }))return false;
+
+ simulationArchives=nextArchives;
+ currentPerformancePeriodId=nextPeriodId;
+ currentPerformancePeriodStartedAt=archivedAt;
+ selectedStatsArchive="active";
+ renderStatisticsArchives();
+ updateSimulationPanel();
+ addSimulationHistory("Período estatístico arquivado: "+
+  records.filter(record=>record.status==="completed").length+
+  " entrada(s) concluída(s); registros preservados.");
+ return true;
+}
+function resetSimulationStatistics(){
+ const records=simulationRecords.filter(record=>
+  record.periodId===currentPerformancePeriodId
+ );
+ const completed=records.filter(record=>record.status==="completed").length;
+ const message="Arquivar "+completed+
+  " entrada(s) concluída(s) e redefinir as estatísticas do período atual? "+
+  "Os registros serão preservados no arquivo.";
+ if(!window.confirm(message))return;
+ if(!archiveCurrentPerformancePeriod()){
+  addSimulationHistory("Não foi possível arquivar o período atual. A redefinição não foi aplicada.");
+ }
+}
+function createSimulationId(){
+ let id;
+ do{
+  id=window.crypto&&typeof window.crypto.randomUUID==="function"
+   ?window.crypto.randomUUID()
+   :Date.now().toString(36)+"-"+(++simulationIdSequence).toString(36)+"-"+
+    Math.random().toString(36).slice(2);
+ }while(simulationRecords.some(record=>record.id===id)||
+  Object.values(pendingSimulations).some(job=>job.id===id));
+ return id;
 }
 function brasiliaTime(timestamp){
  return new Intl.DateTimeFormat("pt-BR",{
@@ -735,8 +1320,8 @@ function addSimulationHistory(text){
  else if(text.startsWith("LOSS"))row.classList.add("bad");
  else if(text.startsWith("EMPATE"))row.classList.add("neutral");
  row.textContent=brasiliaTime(Date.now())+" · "+text;
- $("simHistory").prepend(row);
- while($("simHistory").children.length>8)$("simHistory").lastElementChild.remove();
+ $("simActivity").prepend(row);
+ while($("simActivity").children.length>8)$("simActivity").lastElementChild.remove();
 }
 function updateBrasiliaClock(){
      const now=new Date();
@@ -765,14 +1350,15 @@ function renderActiveCountdowns(){
  if(!panel)return;
 
  const active=Object.entries(pendingSimulations).filter(([,job])=>
-  !job.cancelled&&job.entered&&Number.isFinite(job.entryAt)&&Number.isFinite(job.exitAt)
+  !job.cancelled&&Number.isFinite(job.entryAt)&&Number.isFinite(job.exitAt)
  );
 
  panel.innerHTML="";
  panel.hidden=active.length===0;
 
  active.forEach(([key,job])=>{
-  const remaining=Math.max(0,job.exitAt-Date.now());
+  const targetAt=job.entered?job.exitAt:job.entryAt;
+  const remaining=Math.max(0,targetAt-Date.now());
   const seconds=Math.ceil(remaining/1000);
   const minutes=String(Math.floor(seconds/60)).padStart(2,"0");
   const secs=String(seconds%60).padStart(2,"0");
@@ -789,7 +1375,10 @@ function renderActiveCountdowns(){
   status.className="countdown-status";
   status.textContent=job.finishing
    ?"CONSULTANDO RESULTADO"
-   :job.entered?"ENTRADA CONFIRMADA":"ENTRADA PREVISTA";
+   :job.entered?"ENTRADA CONFIRMADA"
+   :remaining<=60000&&remaining>0?"FALTA 1 MINUTO PARA ENTRAR."
+   :remaining<=300000&&remaining>0?"FALTAM 5 MINUTOS PARA ENTRAR."
+   :remaining===0?"REVALIDANDO ENTRADA":"ENTRADA PREVISTA";
 
   const value=document.createElement("strong");
   value.className="countdown-time";
@@ -808,12 +1397,59 @@ async function getSimulationPrice(symbol){
  if(!Number.isFinite(price)||price<=0)throw new Error("Preço inválido recebido da Binance.");
  return price;
 }
+function removePendingSimulation(key,job){
+ job.cancelled=true;
+ if(job.entryTimer)clearTimeout(job.entryTimer);
+ if(job.exitTimer)clearTimeout(job.exitTimer);
+ if(pendingSimulations[key]===job)delete pendingSimulations[key];
+ persistPendingSimulations();
+ renderActiveCountdowns();
+}
+function markSimulationInconclusive(key,job,reason){
+ if(job.cancelled||pendingSimulations[key]!==job)return;
+ const recordedAt=Date.now();
+ saveSimulationRecord({
+  id:job.id,
+  periodId:job.periodId,
+  symbol:job.symbol,
+  direction:job.direction,
+  entryAt:job.entryAt,
+  exitAt:job.exitAt,
+  entryPrice:Number.isFinite(job.entryPrice)?job.entryPrice:null,
+  exitPrice:null,
+  changePercent:null,
+  result:null,
+  status:"inconclusive",
+  reason,
+  recordedAt
+ });
+ removePendingSimulation(key,job);
+ $("entrySchedule").textContent="SIMULAÇÃO INCONCLUSIVA · "+job.symbol+" · "+reason;
+ addSimulationHistory("INCONCLUSIVA: "+job.symbol+" · "+reason);
+}
+function cancelMissedEntry(key,job){
+ if(job.cancelled||pendingSimulations[key]!==job)return;
+ markSimulationInconclusive(
+  key,job,"o aplicativo ficou suspenso até depois do horário de entrada; nenhuma entrada atrasada foi executada"
+ );
+}
+function recoverPendingSimulations(){
+ const now=Date.now();
+ Object.entries(pendingSimulations).forEach(([key,job])=>{
+  if(!job.entered&&job.entryAt<=now){
+   cancelMissedEntry(key,job);
+  }else if(job.entered&&job.exitAt<=now){
+   markSimulationInconclusive(
+    key,job,
+    "o horário de encerramento passou enquanto o aplicativo estava suspenso; o resultado não foi calculado"
+   );
+  }
+ });
+ renderActiveCountdowns();
+}
 function cancelPendingSimulations(){
  Object.entries(pendingSimulations).forEach(([key,job])=>{
-  job.cancelled=true;
-  if(job.entryTimer)clearTimeout(job.entryTimer);
-  if(job.exitTimer)clearTimeout(job.exitTimer);
-  delete pendingSimulations[key];
+  removePendingSimulation(key,job);
  });
  renderActiveCountdowns();
  $("entrySchedule").textContent="Simulações pendentes e cronômetros cancelados pelo usuário.";
@@ -830,6 +1466,8 @@ function scheduleSimulation(r){
  const key=symbol+"_"+direction;
  if(pendingSimulations[key])return;
  const job={
+  id:createSimulationId(),
+  periodId:currentPerformancePeriodId,
   entryTimer:null,
   exitTimer:null,
   cancelled:false,
@@ -837,10 +1475,14 @@ function scheduleSimulation(r){
   direction,
   entryAt:Date.now()+lead*60000,
   exitAt:Date.now()+(lead+duration)*60000,
+  entryPrice:null,
+  horizon,
   entered:false,
   finishing:false
  };
  pendingSimulations[key]=job;
+ persistPendingSimulations();
+ renderActiveCountdowns();
 
  const entryTime=job.entryAt;
  const entryLabel=new Date(entryTime).toLocaleTimeString("pt-BR");
@@ -851,78 +1493,163 @@ function scheduleSimulation(r){
  addSimulationHistory("Programada: "+symbol+" · "+entryLabel+
   " · Horizonte "+lead+" min · Duração "+duration+" min.");
 
+ armSimulationEntry(key,job,horizon,duration);
+}
+function resumePendingSimulations(){
+ Object.entries(pendingSimulations).forEach(([key,job])=>{
+  if(job.entered){
+   armSimulationExit(key,job);
+  }else if(job.entryAt<=Date.now()){
+   cancelMissedEntry(key,job);
+  }else{
+   armSimulationEntry(key,job,job.horizon,job.horizon);
+  }
+ });
+}
+function armSimulationEntry(key,job,horizon,duration){
+ if(job.cancelled||job.entered||job.entryTimer)return;
+ const remaining=job.entryAt-Date.now();
+ if(remaining<=0){
+  cancelMissedEntry(key,job);
+  return;
+ }
  job.entryTimer=setTimeout(async()=>{
+  job.entryTimer=null;
   if(job.cancelled||!running)return;
+  if(Date.now()>=job.entryAt&&
+   (document.hidden||(appHiddenAt!==null&&appHiddenAt<=job.entryAt))){
+   cancelMissedEntry(key,job);
+   return;
+  }
+  const untilEntry=job.entryAt-Date.now();
+  if(untilEntry>0){
+   job.entryTimer=setTimeout(()=>{
+    job.entryTimer=null;
+    armSimulationEntry(key,job,horizon,duration);
+   },untilEntry);
+   return;
+  }
   try{
-   addSimulationHistory("Revalidando sinal: "+symbol+"...");
-   const check=await analyzeSymbol(symbol);
+   addSimulationHistory("Revalidando sinal: "+job.symbol+"...");
+   const check=await analyzeSymbol(job.symbol);
    if(job.cancelled||!running)return;
-   if(!check.valid||check.direction!==direction||check.horizon!==horizon){
+   if(!check.valid||check.direction!==job.direction||check.horizon!==horizon){
     const reason=!check.valid
      ? (check.reasons||[]).join("; ")||"Critérios não confirmados"
      : "Direção ou horizonte mudou";
-    $("entrySchedule").textContent="SIMULAÇÃO CANCELADA · "+symbol+" · "+reason;
-    addSimulationHistory("CANCELADA: "+symbol+" · "+reason+". Nenhuma entrada contabilizada.");
-    delete pendingSimulations[key];
+    $("entrySchedule").textContent="SIMULAÇÃO CANCELADA · "+job.symbol+" · "+reason;
+    addSimulationHistory("CANCELADA: "+job.symbol+" · "+reason+". Nenhuma entrada contabilizada.");
+    removePendingSimulation(key,job);
     return;
    }
   }catch(e){
    if(job.cancelled||!running)return;
-   const message="Não foi possível revalidar "+symbol+": "+e.message;
+   const message="Não foi possível revalidar "+job.symbol+": "+e.message;
    $("entrySchedule").textContent="SIMULAÇÃO CANCELADA · "+message;
    addSimulationHistory("CANCELADA: "+message);
-   delete pendingSimulations[key];
+   removePendingSimulation(key,job);
    return;
   }
 
-  let entryPrice;
   try{
-   entryPrice=await getSimulationPrice(symbol);
+   job.entryPrice=await getSimulationPrice(job.symbol);
    if(job.cancelled||!running)return;
   }catch(e){
    if(job.cancelled||!running)return;
-   const message="Não foi possível obter o preço de entrada de "+symbol+": "+e.message;
-   $("entrySchedule").textContent=message;
-   addSimulationHistory("Simulação sem resultado: "+message);
-   delete pendingSimulations[key];
+   markSimulationInconclusive(
+    key,job,"não foi possível obter o preço de entrada: "+e.message
+   );
    return;
   }
 
   job.entered=true;
   job.entryAt=Date.now();
   job.exitAt=job.entryAt+duration*60000;
-  addSimulationHistory("Entrada simulada confirmada: "+symbol+" · USDT "+fmt(entryPrice)+
+  persistPendingSimulations();
+  addSimulationHistory("Entrada simulada confirmada: "+job.symbol+" · USDT "+fmt(job.entryPrice)+
    " · Horário: "+brasiliaTime(job.entryAt)+".");
   renderActiveCountdowns();
-  addSimulationHistory("Cronômetro iniciado: "+symbol+" · "+duration+" minuto(s).");
-  job.exitTimer=setTimeout(async()=>{
-   if(job.cancelled||!running)return;
-   job.finishing=true;
+  addSimulationHistory("Cronômetro iniciado: "+job.symbol+" · "+duration+" minuto(s).");
+  armSimulationExit(key,job);
+ },remaining);
+}
+function armSimulationExit(key,job){
+ if(job.cancelled||!job.entered||job.exitTimer||job.finishing)return;
+ const remaining=job.exitAt-Date.now();
+ job.exitTimer=setTimeout(()=>{
+  job.exitTimer=null;
+  finishSimulation(key,job);
+ },Math.max(0,remaining));
+}
+async function finishSimulation(key,job){
+ if(job.cancelled||pendingSimulations[key]!==job)return;
+ const remaining=job.exitAt-Date.now();
+ if(remaining>0){
+  armSimulationExit(key,job);
+  return;
+ }
+ if(document.hidden||(appHiddenAt!==null&&appHiddenAt<=job.exitAt)){
+  markSimulationInconclusive(
+   key,job,
+   "o horário de encerramento passou enquanto o aplicativo estava suspenso; o resultado não foi calculado"
+  );
+  return;
+ }
+ if(job.finishing)return;
+ job.finishing=true;
+ renderActiveCountdowns();
+ try{
+  const exitPrice=await getSimulationPrice(job.symbol);
+  if(job.cancelled||pendingSimulations[key]!==job)return;
+  const timeUntilExit=job.exitAt-Date.now();
+  if(timeUntilExit>0){
+   job.finishing=false;
+   armSimulationExit(key,job);
    renderActiveCountdowns();
-   try{
-    const exitPrice=await getSimulationPrice(symbol);
-    if(job.cancelled||!running)return;
-    const exitAt=Date.now();
-    const change=direction==="BUY"
-     ? (exitPrice-entryPrice)/entryPrice
-     : (entryPrice-exitPrice)/entryPrice;
-    const result=change>0.0005?"WIN":change< -0.0005?"LOSS":"EMPATE";
-    simulationStats[result]++;
-    updateSimulationPanel();
-    addSimulationHistory(result+" · "+symbol+" · Entrada USDT "+fmt(entryPrice)+
-     " · Saída USDT "+fmt(exitPrice)+" · Entrada: "+brasiliaTime(job.entryAt)+
-     " · Saída: "+brasiliaTime(exitAt)+" · Variação favorável: "+(change*100).toFixed(3)+"%.");
-   }catch(e){
-    if(!job.cancelled&&running){
-     addSimulationHistory("Simulação sem resultado: não foi possível consultar o preço final de "+
-      symbol+": "+e.message);
-    }
-   }finally{
-    if(pendingSimulations[key]===job)delete pendingSimulations[key];
-    renderActiveCountdowns();
-   }
-  },duration*60000);
- },lead*60000);
+   return;
+  }
+  if(document.hidden||(appHiddenAt!==null&&appHiddenAt<=job.exitAt)){
+   markSimulationInconclusive(
+    key,job,
+    "o aplicativo ficou suspenso durante a consulta do preço final; o resultado não foi calculado"
+   );
+   return;
+  }
+  const exitAt=Date.now();
+  const change=job.direction==="BUY"
+   ? (exitPrice-job.entryPrice)/job.entryPrice
+   : (job.entryPrice-exitPrice)/job.entryPrice;
+  const result=change>0.0005?"WIN":change< -0.0005?"LOSS":"EMPATE";
+  saveSimulationRecord({
+   id:job.id,
+   periodId:job.periodId,
+   symbol:job.symbol,
+   direction:job.direction,
+   entryAt:job.entryAt,
+   exitAt,
+   entryPrice:job.entryPrice,
+   exitPrice,
+   changePercent:change*100,
+   result,
+   status:"completed",
+   recordedAt:exitAt
+  });
+  addSimulationHistory(result+" · "+job.symbol+" · Entrada USDT "+fmt(job.entryPrice)+
+   " · Saída USDT "+fmt(exitPrice)+" · Entrada: "+brasiliaTime(job.entryAt)+
+   " · Saída: "+brasiliaTime(exitAt)+" · Variação favorável: "+(change*100).toFixed(3)+"%.");
+ }catch(e){
+  if(!job.cancelled&&pendingSimulations[key]===job){
+   markSimulationInconclusive(
+    key,job,"não foi possível consultar o preço final: "+e.message
+   );
+  }
+ }finally{
+  if(pendingSimulations[key]===job){
+   delete pendingSimulations[key];
+   persistPendingSimulations();
+  }
+  renderActiveCountdowns();
+ }
 }
 function renderSpotRisk(r){
  const output=$("riskResult");
@@ -1051,16 +1778,23 @@ function showCandidate(r){
 async function scan(){
  if($("platform").value!=="binance"||scanBusy||!running)return;
  scanBusy=true;
+ const generation=++scanGeneration;
  $("scannerState").textContent="Analisando ativos e períodos...";
  setStatus("Analisando");
  try{
   const results=[];
   for(const symbol of SYMBOLS){
-   if(!running)break;
-   try{results.push(await analyzeSymbol(symbol))}
-   catch(e){results.push({symbol,direction:"WAIT",quality:0,valid:false,error:e.message})}
+   if(!running||generation!==scanGeneration)break;
+   try{
+    const result=await analyzeSymbol(symbol);
+    if(generation!==scanGeneration)return;
+    results.push(result);
+   }catch(e){
+    if(generation!==scanGeneration)return;
+    results.push({symbol,direction:"WAIT",quality:0,valid:false,error:e.message});
+   }
   }
-  if(!running)return;
+  if(!running||generation!==scanGeneration)return;
   renderScanner(results);
   const candidates=results.filter(r=>r.valid).sort((a,b)=>b.quality-a.quality);
   const best=candidates[0];
@@ -1095,6 +1829,10 @@ async function scan(){
   $("message").textContent="Erro de consulta: "+e.message;
  }finally{
   scanBusy=false;
+  if(resumeScanRequested&&running){
+   resumeScanRequested=false;
+   scan();
+  }
  }
 }
 function initChart(){
@@ -1282,12 +2020,16 @@ function startScanner(){
  running=true;
  $("start").disabled=true;$("stop").disabled=false;
  $("message").textContent="Monitoramento iniciado. Consultas periódicas de dados públicos.";
- scan();
- timer=setInterval(scan,60000);
+ resumePendingSimulations();
+ if(scanBusy)resumeScanRequested=true;
+ else scan();
+ if(!timer)timer=setInterval(scan,60000);
  loadChart();
 }
 function stopScanner(){
  running=false;
+ scanGeneration++;
+ resumeScanRequested=false;
  if(timer)clearInterval(timer);
  timer=null;
  cancelPendingSimulations();
@@ -1295,6 +2037,51 @@ function stopScanner(){
  setStatus("Pausado");
  $("scannerState").textContent="Monitoramento pausado.";
  showWait("Monitoramento interrompido pelo usuário.");
+}
+function markAppHidden(){
+ if(appHiddenAt===null)appHiddenAt=Date.now();
+}
+async function resumeApplication(){
+ if(resumeInProgress){
+  resumeRequested=true;
+  return;
+ }
+ resumeInProgress=true;
+ const hiddenAt=appHiddenAt;
+ appHiddenAt=null;
+ try{
+  if(hiddenAt!==null)recoverPendingSimulations();
+  updateBrasiliaClock();
+  renderActiveCountdowns();
+  if($("platform").value!=="binance")return;
+  if(navigator.onLine===false){
+   $("message").textContent="Conexão indisponível ao retornar ao aplicativo. Verifique a rede.";
+   if(running)$("scannerState").textContent="Aguardando conexão para retomar o monitoramento.";
+   return;
+  }
+  try{
+   await getJSON("/api/v3/ping");
+  }catch(e){
+   $("message").textContent="Não foi possível verificar a conexão com a Binance ao retomar: "+e.message;
+   if(running)$("scannerState").textContent="Aguardando conexão para retomar o monitoramento.";
+   return;
+  }
+  loadChart();
+  if(running){
+   scanGeneration++;
+   if(scanBusy)resumeScanRequested=true;
+   else scan();
+  }
+ }catch(e){
+  console.warn("Erro ao recuperar o aplicativo após a suspensão.",e);
+  $("message").textContent="Erro ao retomar o aplicativo: "+e.message;
+ }finally{
+  resumeInProgress=false;
+  if(resumeRequested){
+   resumeRequested=false;
+   if(!document.hidden)resumeApplication();
+  }
+ }
 }
 function changePlatform(){
  const platform=$("platform").value;
@@ -1342,9 +2129,26 @@ function changePlatform(){
 $("platform").addEventListener("change",changePlatform);
 $("symbol").addEventListener("change",loadChart);
 $("interval").addEventListener("change",loadChart);
+$("statsRange").addEventListener("change",event=>{
+ selectedStatsRange=event.target.value;
+ updateSimulationPanel();
+});
+$("statsArchive").addEventListener("change",event=>{
+ selectedStatsArchive=event.target.value;
+ updateSimulationPanel();
+});
+$("resetStatistics").addEventListener("click",resetSimulationStatistics);
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden)markAppHidden();
+ else if(appHiddenAt!==null)resumeApplication();
+});
+window.addEventListener("pagehide",markAppHidden);
+window.addEventListener("pageshow",event=>{
+ if(event.persisted||appHiddenAt!==null)resumeApplication();
+});
+loadSimulationHistory();
 startBrasiliaClock();
 try{initChart()}catch(e){$("message").textContent="O gráfico será carregado quando a biblioteca estiver disponível."}
 </script>
 </body>
    </html>
- 
