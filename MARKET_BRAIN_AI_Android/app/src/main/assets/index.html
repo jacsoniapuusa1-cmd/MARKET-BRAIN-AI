@@ -640,9 +640,58 @@ function parseCandles(raw){
   volume:closed.map(c=>Number(c[5]))
  };
 }
+function validateCandlesForIndicators(raw,now=Date.now()){
+ if(!Array.isArray(raw)||raw.length===0)
+  throw new Error("Dados de candles inválidos");
+
+ const closed=[];
+ let previousOpenTime=-Infinity;
+
+ for(const c of raw){
+  if(!Array.isArray(c)||c.length<7)
+   throw new Error("Candle incompleto");
+
+  const openTime=Number(c[0]);
+  const closeTime=Number(c[6]);
+
+  if(!Number.isFinite(openTime)||!Number.isFinite(closeTime)||
+   openTime<0||closeTime<=openTime)
+   throw new Error("Horário de candle inválido");
+
+  if(openTime<=previousOpenTime)
+   throw new Error("Candles fora de ordem");
+
+  previousOpenTime=openTime;
+
+  if(closeTime>=now)continue;
+
+  const open=Number(c[1]);
+  const high=Number(c[2]);
+  const low=Number(c[3]);
+  const close=Number(c[4]);
+  const volume=Number(c[5]);
+
+  if(![open,high,low,close,volume].every(Number.isFinite))
+   throw new Error("Valores inválidos no candle");
+
+  if(open<=0||high<=0||low<=0||close<=0||volume<0)
+   throw new Error("Preço ou volume fora dos limites");
+
+  if(high<low||high<open||high<close||low>open||low>close)
+   throw new Error("OHLC inconsistente");
+
+  closed.push(c);
+ }
+
+ if(closed.length<35)
+  throw new Error("Histórico insuficiente");
+
+ return closed;
+}
 async function fetchFrame(symbol,interval){
  const raw=await getJSON("/api/v3/klines?symbol="+symbol+"&interval="+interval+"&limit=120");
- const data=parseCandles(raw);
+ const validRaw=validateCandlesForIndicators(raw);
+ const data=parseCandles(validRaw);
  if(data.close.length<35)throw new Error("Histórico insuficiente");
  const e9=ema(data.close,9),e21=ema(data.close,21);
  const rr=rsi(data.close),mm=macd(data.close);
@@ -653,14 +702,24 @@ async function fetchFrame(symbol,interval){
  const n=data.close.length;
  const avg=data.volume.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
  const rv=avg>0?data.volume.at(-1)/avg:0;
+ const price=data.close.at(-1);
+ const atrPercent=atrValue/price*100;
+
+ if(!Number.isFinite(e9[n-1])||
+  !Number.isFinite(e21[n-1])||
+  !Number.isFinite(rv)||
+  !Number.isFinite(atrPercent)||
+  !Number.isFinite(price)||price<=0)
+  throw new Error("Indicadores com valores inválidos");
+
  const direction=e9[n-1]>e21[n-1]&&rr>50&&mm.line>mm.signal?"BUY":
   e9[n-1]<e21[n-1]&&rr<50&&mm.line<mm.signal?"SELL":"NEUTRAL";
  return {
   interval,direction,
   rsi:rr,ema9:e9[n-1],ema21:e21[n-1],
   macd:mm,relativeVolume:rv,
-  atr:atrValue,atrPercent:atrValue/data.close.at(-1)*100,
-  price:data.close.at(-1),raw:data.raw
+  atr:atrValue,atrPercent,
+  price,raw:data.raw
  };
 }
 async function analyzeSymbol(symbol){
